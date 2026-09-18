@@ -216,3 +216,4 @@ export type CampaignMetricRow = typeof campaignMetrics.$inferSelect;
 export type MockCompetitorRow = typeof mockCompetitors.$inferSelect;
 export type MockReviewRow = typeof mockReviews.$inferSelect;
 export type MockSearchFixtureRow = typeof mockSearchFixtures.$inferSelect;
+export type LlmCallRow = typeof llmCalls.$inferSelect;
