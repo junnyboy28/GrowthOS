@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
+import { getResearchReportForRun } from "@/lib/db/queries/research";
 import { getRunWithLlmCalls } from "@/lib/db/queries/runs";
 import { STAGE_NAMES } from "@/lib/pipeline/orchestrator";
+import { ResearchCards } from "./ResearchCards";
 import { RunStatus } from "./RunStatus";
 
 export default async function RunPage({
@@ -13,9 +15,10 @@ export default async function RunPage({
   if (!result) {
     notFound();
   }
+  const research = await getResearchReportForRun(id);
 
   return (
-    <main className="mx-auto max-w-3xl p-8">
+    <main className="mx-auto max-w-4xl p-8">
       <h1 className="text-2xl font-bold">Run {result.run.id.slice(0, 8)}</h1>
       <p className="text-sm text-gray-600">Goal: {result.goalText}</p>
       <RunStatus
@@ -24,6 +27,7 @@ export default async function RunPage({
         initialLlmCalls={result.llmCalls}
         stageNames={STAGE_NAMES}
       />
+      {research && <ResearchCards output={research.output} />}
     </main>
   );
 }

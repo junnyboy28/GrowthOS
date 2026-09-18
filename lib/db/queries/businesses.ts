@@ -39,6 +39,12 @@ export async function createBusinessWithGoal(
   });
 }
 
+export async function getBusinessById(id: string): Promise<Business | null> {
+  const db = getDb();
+  const [business] = await db.select().from(businesses).where(eq(businesses.id, id));
+  return business ?? null;
+}
+
 export async function getBusinessWithGoals(
   id: string,
 ): Promise<{ business: Business; goals: Goal[] } | null> {
