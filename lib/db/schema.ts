@@ -74,13 +74,15 @@ export const creatives = pgTable("creatives", {
 
 export const campaigns = pgTable("campaigns", {
   id: uuid("id").defaultRandom().primaryKey(),
-  strategyId: uuid("strategy_id")
-    .notNull()
-    .references(() => strategies.id),
+  /** Nullable: MockMetaAds.createCampaign(spec) — per the documented AdsPlatform interface — has no
+   * strategy id to attach. The real pipeline (Phase 6) sets this when it persists the row itself. */
+  strategyId: uuid("strategy_id").references(() => strategies.id),
   spec: jsonb("spec").notNull(),
   externalId: text("external_id"),
   status: text("status").notNull().default("pending_launch"),
   dailyBudget: integer("daily_budget").notNull(),
+  /** Current per-creative allocation weights, mutated by AdsPlatform.setCreativeAllocation. Null = equal split. */
+  creativeWeights: jsonb("creative_weights"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -206,3 +208,11 @@ export const mockSearchFixtures = pgTable("mock_search_fixtures", {
 export type Business = typeof businesses.$inferSelect;
 export type Goal = typeof goals.$inferSelect;
 export type Run = typeof runs.$inferSelect;
+// Suffixed with "Row" to avoid colliding with the same-named content types in lib/schemas/.
+export type StrategyRow = typeof strategies.$inferSelect;
+export type CreativeRow = typeof creatives.$inferSelect;
+export type CampaignRow = typeof campaigns.$inferSelect;
+export type CampaignMetricRow = typeof campaignMetrics.$inferSelect;
+export type MockCompetitorRow = typeof mockCompetitors.$inferSelect;
+export type MockReviewRow = typeof mockReviews.$inferSelect;
+export type MockSearchFixtureRow = typeof mockSearchFixtures.$inferSelect;
