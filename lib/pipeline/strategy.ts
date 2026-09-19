@@ -7,7 +7,7 @@ import { getResearchReportForRun } from "@/lib/db/queries/research";
 import { structured } from "@/lib/llm/structured";
 import type { ResearchOutput } from "@/lib/schemas/researchOutput";
 import { CHANNELS, StrategySchema, type Strategy } from "@/lib/schemas/strategy";
-import type { StageContext } from "./orchestrator";
+import type { StageContext } from "./stage";
 import { strategySystemPrompt, strategyUserPrompt } from "./strategy.prompt";
 
 const STAGE_NAME = "strategy";

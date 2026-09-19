@@ -10,10 +10,12 @@ interface RunStatusProps {
   stageNames: readonly string[];
 }
 
-type StageState = "done" | "running" | "failed" | "pending";
+type StageState = "done" | "running" | "failed" | "pending" | "awaiting_approval";
 
+/** Non-terminal, not just pending/running — awaiting_approval must keep polling too, so it can
+ * catch the eventual transition to done once the user clicks Continue. */
 function isActive(run: Run): boolean {
-  return run.status === "pending" || run.status === "running";
+  return run.status !== "done" && run.status !== "failed";
 }
 
 /** Stages run strictly in order and stop at the first failure, so a stage earlier in the list than
@@ -25,7 +27,11 @@ function getStageState(name: string, run: Run, stageNames: readonly string[]): S
   const nameIndex = stageNames.indexOf(name);
   if (currentIndex === -1) return "pending";
   if (nameIndex < currentIndex) return "done";
-  if (nameIndex === currentIndex) return run.status === "failed" ? "failed" : "running";
+  if (nameIndex === currentIndex) {
+    if (run.status === "failed") return "failed";
+    if (run.status === "awaiting_approval") return "awaiting_approval";
+    return "running";
+  }
   return "pending";
 }
 
@@ -34,6 +40,7 @@ const STAGE_STYLE: Record<StageState, { symbol: string; color: string }> = {
   running: { symbol: "▶", color: "text-amber-600" },
   failed: { symbol: "✗", color: "text-red-600" },
   pending: { symbol: "○", color: "text-gray-400" },
+  awaiting_approval: { symbol: "⏸", color: "text-blue-600" },
 };
 
 export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: RunStatusProps) {
@@ -132,5 +139,5 @@ function StatusBadge({ status }: { status: string }) {
       : status === "failed"
         ? "text-red-700"
         : "text-amber-700";
-  return <span className={`font-medium ${color}`}>{status}</span>;
+  return <span className={`font-medium ${color}`}>{status.replace(/_/g, " ")}</span>;
 }

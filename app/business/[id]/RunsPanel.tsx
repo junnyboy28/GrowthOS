@@ -9,8 +9,10 @@ interface RunsPanelProps {
   initialRuns: Run[];
 }
 
+/** Non-terminal, not just pending/running — awaiting_approval must keep polling too, so it can
+ * catch the eventual transition to done once the user approves creatives and continues. */
 function isActive(run: Run): boolean {
-  return run.status === "pending" || run.status === "running";
+  return run.status !== "done" && run.status !== "failed";
 }
 
 export function RunsPanel({ goals, initialRuns }: RunsPanelProps) {

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { goals, runs } from "@/lib/db/schema";
 
 interface FakeGoal {
   id: string;
@@ -24,8 +25,12 @@ let nextId = 1;
 function makeFakeDb() {
   return {
     select: () => ({
-      from: () => ({
-        where: async () => [GOAL],
+      from: (table: unknown) => ({
+        where: async () => {
+          if (table === goals) return [GOAL];
+          if (table === runs) return runRow ? [runRow] : [];
+          return [];
+        },
       }),
     }),
     insert: () => ({
@@ -61,7 +66,7 @@ vi.mock("@/lib/db/client", () => ({
   getDb: () => makeFakeDb(),
 }));
 
-const { createRun, runStages } = await import("@/lib/pipeline/orchestrator");
+const { createRun, resumeRun, runStages, StagePause } = await import("@/lib/pipeline/orchestrator");
 
 beforeEach(() => {
   runRow = null;
@@ -128,6 +133,100 @@ describe("orchestrator", () => {
     await runStages(run, [stage]);
 
     expect(seenStatusAtRunTime).toEqual(["running", "solo"]);
+    expect(runRow?.status).toBe("done");
+  });
+});
+
+describe("orchestrator pause/resume", () => {
+  it("pauses instead of failing when a stage throws StagePause", async () => {
+    const order: string[] = [];
+    const pausingStage = {
+      name: "content",
+      run: vi.fn(async () => {
+        order.push("content");
+        throw new StagePause("waiting for approval");
+      }),
+    };
+    const neverReachedStage = {
+      name: "campaign",
+      run: vi.fn(async () => {
+        order.push("campaign");
+      }),
+    };
+
+    const run = await createRun(GOAL.id);
+    await runStages(run, [pausingStage, neverReachedStage]);
+
+    expect(order).toEqual(["content"]);
+    expect(neverReachedStage.run).not.toHaveBeenCalled();
+    expect(runRow?.stage).toBe("content");
+    expect(runRow?.status).toBe("awaiting_approval");
+    expect(runRow?.finishedAt).toBeNull();
+    expect(runRow?.error).toBeNull();
+  });
+
+  it("continues from where it paused when runStages is re-invoked with the remaining stages", async () => {
+    const pausingStage = {
+      name: "content",
+      run: vi.fn(async () => {
+        throw new StagePause("waiting for approval");
+      }),
+    };
+    const nextStage = { name: "campaign", run: vi.fn(async () => {}) };
+
+    const run = await createRun(GOAL.id);
+    await runStages(run, [pausingStage, nextStage]);
+    expect(runRow?.status).toBe("awaiting_approval");
+
+    // This is exactly what resumeRun does internally: re-invoke runStages with the slice after
+    // the paused stage.
+    await runStages(run, [nextStage]);
+
+    expect(nextStage.run).toHaveBeenCalledTimes(1);
+    expect(runRow?.stage).toBe("done");
+    expect(runRow?.status).toBe("done");
+    expect(runRow?.finishedAt).not.toBeNull();
+  });
+
+  it("resumeRun rejects if the run is not awaiting approval", async () => {
+    const run = await createRun(GOAL.id);
+    await expect(resumeRun(run.id, [])).rejects.toThrow(/not awaiting approval/i);
+  });
+
+  it("resumeRun rejects if the paused stage isn't in the provided stage list", async () => {
+    const pausingStage = {
+      name: "content",
+      run: vi.fn(async () => {
+        throw new StagePause("waiting for approval");
+      }),
+    };
+    const run = await createRun(GOAL.id);
+    await runStages(run, [pausingStage]);
+    expect(runRow?.status).toBe("awaiting_approval");
+
+    await expect(
+      resumeRun(run.id, [{ name: "other", run: vi.fn(async () => {}) }]),
+    ).rejects.toThrow(/not in the registered stage list/i);
+  });
+
+  it("resumeRun kicks off the remaining stages and eventually reaches done", async () => {
+    const pausingStage = {
+      name: "content",
+      run: vi.fn(async () => {
+        throw new StagePause("waiting for approval");
+      }),
+    };
+    const nextStage = { name: "campaign", run: vi.fn(async () => {}) };
+
+    const run = await createRun(GOAL.id);
+    await runStages(run, [pausingStage, nextStage]);
+    expect(runRow?.status).toBe("awaiting_approval");
+
+    await resumeRun(run.id, [pausingStage, nextStage]);
+    // resumeRun fires runStages without awaiting it; flush the microtask queue.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(nextStage.run).toHaveBeenCalledTimes(1);
     expect(runRow?.status).toBe("done");
   });
 });

@@ -1,24 +1,19 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { goals, runs, type Run } from "@/lib/db/schema";
+import { contentStage } from "./content";
 import { researchStage } from "./research";
+import { StagePause, type PipelineStage } from "./stage";
 import { strategyStage } from "./strategy";
 
-export interface StageContext {
-  runId: string;
-  businessId: string;
-  goalId: string;
-}
-
-export interface PipelineStage {
-  name: string;
-  run(ctx: StageContext): Promise<void>;
-}
+export type { PipelineStage, StageContext } from "./stage";
+export { StagePause } from "./stage";
 
 /** Registered in order. Adding a stage is a one-line change here — nothing else needs to know about it. */
 export const STAGES: PipelineStage[] = [
   { name: "research", run: researchStage },
   { name: "strategy", run: strategyStage },
+  { name: "content", run: contentStage },
 ];
 
 export const STAGE_NAMES: readonly string[] = STAGES.map((stage) => stage.name);
@@ -45,10 +40,12 @@ export async function createRun(goalId: string): Promise<Run> {
 }
 
 /** Executes stages in order against an already-created run, updating stage/status as it goes.
+ * A stage throwing StagePause stops the loop with status=awaiting_approval instead of failed,
+ * leaving `stage` set to whichever stage paused so resumeRun knows where to continue.
  * Defaults to the registered STAGES; tests pass their own list to exercise failure handling. */
 export async function runStages(run: Run, stages: PipelineStage[] = STAGES): Promise<void> {
   const db = getDb();
-  const ctx: StageContext = {
+  const ctx = {
     runId: run.id,
     businessId: run.businessId,
     goalId: run.goalId,
@@ -63,6 +60,10 @@ export async function runStages(run: Run, stages: PipelineStage[] = STAGES): Pro
     try {
       await stage.run(ctx);
     } catch (error) {
+      if (error instanceof StagePause) {
+        await db.update(runs).set({ status: "awaiting_approval" }).where(eq(runs.id, run.id));
+        return;
+      }
       await db
         .update(runs)
         .set({
@@ -93,5 +94,31 @@ export async function startRun(
     // in that error handling itself.
     console.error(`runStages crashed outside its own error handling for run ${run.id}`, error);
   });
+  return run;
+}
+
+/** Resumes a paused run from the stage after the one it paused at. Callers are responsible for
+ * deciding WHEN resuming is appropriate (e.g. checking >=1 creative is approved) — this function
+ * is stage-agnostic and just continues wherever `run.stage` says it stopped. */
+export async function resumeRun(runId: string, stages: PipelineStage[] = STAGES): Promise<Run> {
+  const db = getDb();
+  const [run] = await db.select().from(runs).where(eq(runs.id, runId));
+  if (!run) {
+    throw new Error(`Run ${runId} not found`);
+  }
+  if (run.status !== "awaiting_approval") {
+    throw new Error(`Run ${runId} is not awaiting approval (status: ${run.status})`);
+  }
+
+  const pausedIndex = stages.findIndex((stage) => stage.name === run.stage);
+  if (pausedIndex === -1) {
+    throw new Error(`Cannot resume: stage "${run.stage}" is not in the registered stage list`);
+  }
+
+  const remainingStages = stages.slice(pausedIndex + 1);
+  runStages(run, remainingStages).catch((error: unknown) => {
+    console.error(`runStages crashed outside its own error handling for run ${run.id}`, error);
+  });
+
   return run;
 }

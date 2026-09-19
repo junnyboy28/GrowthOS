@@ -7,7 +7,7 @@ import { getCompetitorsForBusiness, getReviewsForBusiness } from "@/lib/db/queri
 import { structured } from "@/lib/llm/structured";
 import type { EvidenceItem } from "@/lib/schemas/evidence";
 import { ResearchOutputSchema, type ResearchOutput } from "@/lib/schemas/researchOutput";
-import type { StageContext } from "./orchestrator";
+import type { StageContext } from "./stage";
 import { researchSystemPrompt, researchUserPrompt } from "./research.prompt";
 
 const STAGE_NAME = "research";
