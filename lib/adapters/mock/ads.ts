@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { and, eq, gte, lte } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
-import { actions, campaignMetrics, campaigns } from "@/lib/db/schema";
+import { campaignMetrics, campaigns } from "@/lib/db/schema";
 import type { CampaignSpec } from "@/lib/schemas/campaignSpec";
 import type { DailyMetric } from "@/lib/schemas/dailyMetric";
 import type { AdsPlatform } from "../types";
@@ -30,36 +30,22 @@ export class MockMetaAds implements AdsPlatform {
     return { externalId: generateExternalId() };
   }
 
+  /** Mutates our own campaigns row (simulating the ad platform's own state) but does NOT log to
+   * `actions` — execute.ts owns all actions-table writes centrally, so callers get one row per
+   * logical operation instead of each adapter method also writing its own. */
   async updateBudget(externalId: string, dailyBudget: number): Promise<void> {
     const db = getDb();
     const campaign = await getCampaignByExternalId(externalId);
-    const before = { dailyBudget: campaign.dailyBudget };
-    const after = { dailyBudget: Math.round(dailyBudget) };
-
-    await db.update(campaigns).set(after).where(eq(campaigns.id, campaign.id));
-    await db.insert(actions).values({
-      recommendationId: null,
-      adapter: "MockMetaAds",
-      method: "updateBudget",
-      before,
-      after,
-    });
+    await db
+      .update(campaigns)
+      .set({ dailyBudget: Math.round(dailyBudget) })
+      .where(eq(campaigns.id, campaign.id));
   }
 
   async pauseCampaign(externalId: string): Promise<void> {
     const db = getDb();
     const campaign = await getCampaignByExternalId(externalId);
-    const before = { status: campaign.status };
-    const after = { status: "paused" };
-
-    await db.update(campaigns).set(after).where(eq(campaigns.id, campaign.id));
-    await db.insert(actions).values({
-      recommendationId: null,
-      adapter: "MockMetaAds",
-      method: "pauseCampaign",
-      before,
-      after,
-    });
+    await db.update(campaigns).set({ status: "paused" }).where(eq(campaigns.id, campaign.id));
   }
 
   async setCreativeAllocation(
@@ -68,17 +54,10 @@ export class MockMetaAds implements AdsPlatform {
   ): Promise<void> {
     const db = getDb();
     const campaign = await getCampaignByExternalId(externalId);
-    const before = { creativeWeights: campaign.creativeWeights };
-    const after = { creativeWeights: weights };
-
-    await db.update(campaigns).set(after).where(eq(campaigns.id, campaign.id));
-    await db.insert(actions).values({
-      recommendationId: null,
-      adapter: "MockMetaAds",
-      method: "setCreativeAllocation",
-      before,
-      after,
-    });
+    await db
+      .update(campaigns)
+      .set({ creativeWeights: weights })
+      .where(eq(campaigns.id, campaign.id));
   }
 
   async fetchMetrics(

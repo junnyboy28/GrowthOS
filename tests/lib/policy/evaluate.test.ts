@@ -152,6 +152,14 @@ describe("evaluate", () => {
     });
   });
 
+  describe("no_action", () => {
+    it("is always allowed — it's a no-op, nothing to gate", () => {
+      const result = evaluate("no_action", {}, CTX);
+      expect(result.decision).toBe("allow");
+      expect(result.ruleId).toBe("no-action-allow");
+    });
+  });
+
   describe("unmatched actions", () => {
     it("fails closed (blocks) for an action with no matching rule", () => {
       const result = evaluate("swap_creative", {}, CTX);
@@ -159,8 +167,7 @@ describe("evaluate", () => {
       expect(result.ruleId).toBe("default-block");
     });
 
-    it("fails closed for no_action and extend_schedule too", () => {
-      expect(evaluate("no_action", {}, CTX).ruleId).toBe("default-block");
+    it("fails closed for extend_schedule too (no adapter support yet)", () => {
       expect(evaluate("extend_schedule", {}, CTX).ruleId).toBe("default-block");
     });
   });

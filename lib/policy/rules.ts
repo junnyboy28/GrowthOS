@@ -47,6 +47,13 @@ export const POLICY_RULES: PolicyRule[] = [
     reason: () => "Generation and analysis actions do not spend money or change a live campaign.",
   },
   {
+    id: "no-action-allow",
+    description: "no_action is always allowed — it's an explicit no-op, so there's nothing to gate.",
+    decision: "allow",
+    matches: (action) => action === "no_action",
+    reason: () => "no_action is a no-op — nothing to spend, launch, or change.",
+  },
+  {
     id: "launch-campaign-approval",
     description: "Launching a campaign always requires approval.",
     decision: "require_approval",

@@ -51,3 +51,8 @@ export const RecommendationSchema = z.discriminatedUnion("action", [
 ]);
 export type Recommendation = z.infer<typeof RecommendationSchema>;
 export type RecommendationAction = Recommendation["action"];
+
+export const RecommendationSetSchema = z.object({
+  recommendations: z.array(RecommendationSchema).min(1).max(3),
+});
+export type RecommendationSet = z.infer<typeof RecommendationSetSchema>;

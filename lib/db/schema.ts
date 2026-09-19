@@ -119,6 +119,9 @@ export const recommendations = pgTable("recommendations", {
     .references(() => observations.id),
   output: jsonb("output").notNull(),
   status: text("status").notNull().default("pending"),
+  /** Why status ended up where it did (the policy reason, or "Approved/Rejected by user") —
+   * recorded directly rather than left only inferable, so it's independently queryable. */
+  resultReason: text("result_reason"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -147,6 +150,10 @@ export const actions = pgTable("actions", {
   recommendationId: uuid("recommendation_id").references(
     () => recommendations.id,
   ),
+  /** Nullable: not every action stems from a recommendation (e.g. launch_campaign never does),
+   * and recommendationId alone can't give a campaign-page timeline an efficient/reliable path to
+   * "which campaign was this for" either way. */
+  campaignId: uuid("campaign_id").references(() => campaigns.id),
   adapter: text("adapter").notNull(),
   method: text("method").notNull(),
   before: jsonb("before"),
@@ -220,3 +227,5 @@ export type LlmCallRow = typeof llmCalls.$inferSelect;
 export type PolicyDecisionRow = typeof policyDecisions.$inferSelect;
 export type ApprovalRow = typeof approvals.$inferSelect;
 export type ActionRow = typeof actions.$inferSelect;
+export type ObservationRow = typeof observations.$inferSelect;
+export type RecommendationRow = typeof recommendations.$inferSelect;

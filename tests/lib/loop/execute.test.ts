@@ -166,10 +166,10 @@ describe("execute", () => {
     expect(createCampaignMock).not.toHaveBeenCalled();
   });
 
-  it("throws for an action with no adapter mapping yet", async () => {
-    await expect(execute("decrease_budget", { delta: 100, newDaily: 400 }, CTX)).rejects.toThrow(
-      /does not yet implement/i,
-    );
+  it("throws for an allowed action with no adapter mapping (not adapter-invoking at all)", async () => {
+    // generate_* is policy-allowed but isn't an adapter action — runAdapterAction has no case for
+    // it and never will (it's not a thing you "execute" through an ads platform).
+    await expect(execute("generate_research", {}, CTX)).rejects.toThrow(/does not yet implement/i);
   });
 });
 

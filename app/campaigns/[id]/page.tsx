@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getActionsForCampaign } from "@/lib/db/queries/actions";
 import { getCampaignById } from "@/lib/db/queries/campaigns";
 import {
   aggregateByCreative,
@@ -8,6 +9,7 @@ import {
 } from "@/lib/db/queries/campaignMetrics";
 import { getLatestObservationsForCampaign } from "@/lib/db/queries/observations";
 import type { CampaignSpec } from "@/lib/schemas/campaignSpec";
+import { ActionsTimeline } from "./ActionsTimeline";
 import { AnalyticsPanel } from "./AnalyticsPanel";
 import { ConversionsChart } from "./ConversionsChart";
 
@@ -22,9 +24,10 @@ export default async function CampaignDashboardPage({
     notFound();
   }
 
-  const [rows, observations] = await Promise.all([
+  const [rows, observations, timelineActions] = await Promise.all([
     getCampaignMetricRows(id),
     getLatestObservationsForCampaign(id),
+    getActionsForCampaign(id),
   ]);
 
   const totals = aggregateTotals(rows);
@@ -89,6 +92,7 @@ export default async function CampaignDashboardPage({
       </section>
 
       <AnalyticsPanel campaignId={id} initialObservations={observations} />
+      <ActionsTimeline actions={timelineActions} />
     </main>
   );
 }

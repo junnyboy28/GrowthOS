@@ -5,7 +5,7 @@ import type { Observations } from "@/lib/schemas/observations";
 
 export async function getLatestObservationsForCampaign(
   campaignId: string,
-): Promise<{ output: Observations; createdAt: Date } | null> {
+): Promise<{ id: string; output: Observations; createdAt: Date } | null> {
   const db = getDb();
   const [row] = await db
     .select()
@@ -18,5 +18,5 @@ export async function getLatestObservationsForCampaign(
     return null;
   }
   // Already validated against ObservationsSchema before it was persisted.
-  return { output: row.output as Observations, createdAt: row.createdAt };
+  return { id: row.id, output: row.output as Observations, createdAt: row.createdAt };
 }
