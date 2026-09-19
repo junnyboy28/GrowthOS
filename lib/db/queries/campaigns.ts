@@ -3,6 +3,17 @@ import { getDb } from "@/lib/db/client";
 import { businesses, campaignMetrics, campaigns, runs, strategies, type Business, type CampaignRow } from "@/lib/db/schema";
 import type { CampaignSpec } from "@/lib/schemas/campaignSpec";
 
+export async function getCampaignById(campaignId: string): Promise<CampaignRow | null> {
+  const db = getDb();
+  const [campaign] = await db.select().from(campaigns).where(eq(campaigns.id, campaignId));
+  return campaign ?? null;
+}
+
+export async function getLiveCampaigns(): Promise<CampaignRow[]> {
+  const db = getDb();
+  return db.select().from(campaigns).where(eq(campaigns.status, "live"));
+}
+
 /** The most recent campaign generated for a run (there's normally exactly one). */
 export async function getCampaignForRun(runId: string): Promise<CampaignRow | null> {
   const db = getDb();
@@ -51,11 +62,9 @@ export interface HistoricalCampaignSummary {
   ctr: number;
 }
 
-/** Campaigns have no direct business_id column, so scope through strategies -> runs. */
-export async function getTopHistoricalCampaignsByCpa(
-  businessId: string,
-  limit: number,
-): Promise<HistoricalCampaignSummary[]> {
+/** Campaigns have no direct business_id column, so scope through strategies -> runs. Shared by
+ * getTopHistoricalCampaignsByCpa and getHistoricalBaseline so they don't each re-derive it. */
+async function getCampaignSummariesForBusiness(businessId: string): Promise<HistoricalCampaignSummary[]> {
   const db = getDb();
 
   const businessCampaigns = await db
@@ -109,6 +118,41 @@ export async function getTopHistoricalCampaignsByCpa(
     });
   }
 
-  summaries.sort((a, b) => a.cpa - b.cpa);
-  return summaries.slice(0, limit);
+  return summaries;
+}
+
+export async function getTopHistoricalCampaignsByCpa(
+  businessId: string,
+  limit: number,
+): Promise<HistoricalCampaignSummary[]> {
+  const summaries = await getCampaignSummariesForBusiness(businessId);
+  return [...summaries].sort((a, b) => a.cpa - b.cpa).slice(0, limit);
+}
+
+function median(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+}
+
+export interface HistoricalBaseline {
+  medianCpa: number;
+  medianCtr: number;
+}
+
+/** Median CPA/CTR across the business's other campaigns — excludes the campaign being analyzed. */
+export async function getHistoricalBaseline(
+  businessId: string,
+  excludeCampaignId?: string,
+): Promise<HistoricalBaseline> {
+  const summaries = await getCampaignSummariesForBusiness(businessId);
+  const filtered = excludeCampaignId
+    ? summaries.filter((summary) => summary.campaignId !== excludeCampaignId)
+    : summaries;
+
+  return {
+    medianCpa: median(filtered.map((summary) => summary.cpa)),
+    medianCtr: median(filtered.map((summary) => summary.ctr)),
+  };
 }

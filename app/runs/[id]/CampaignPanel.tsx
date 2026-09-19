@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import type { CampaignRow } from "@/lib/db/schema";
 import type { CampaignSpec } from "@/lib/schemas/campaignSpec";
@@ -85,6 +86,9 @@ export function CampaignPanel({ initialCampaign }: CampaignPanelProps) {
           Status: <span className="font-medium">{campaign.status}</span>
           {campaign.externalId && ` · External id: ${campaign.externalId}`}
         </p>
+        <Link href={`/campaigns/${campaign.id}`} className="text-xs text-blue-600 hover:underline">
+          View dashboard
+        </Link>
 
         {campaign.status === "pending_launch" && (
           <div className="mt-2 flex flex-col gap-2">

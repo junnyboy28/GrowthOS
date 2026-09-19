@@ -8,6 +8,11 @@ const MetricBlockSchema = z.object({
   ctr: z.number(),
 });
 
+/** Which denominator vs_baseline is a ratio against — recorded explicitly (not left implicit)
+ * so a downstream consumer (e.g. Phase 8's optimization stage) can tell "2x baseline" apart from
+ * "2x this campaign's other creatives" vs "2x our all-time historical median" without guessing. */
+export const BASELINE_TYPES = ["sibling_creatives", "historical_median"] as const;
+
 export const ObservationsSchema = z.object({
   window: z.object({
     start: z.string(),
@@ -18,6 +23,7 @@ export const ObservationsSchema = z.object({
     MetricBlockSchema.extend({
       creative_id: z.string(),
       vs_baseline: z.number(),
+      vs_baseline_type: z.enum(BASELINE_TYPES),
     }),
   ),
   anomalies: z.array(z.string()),

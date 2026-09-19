@@ -3,6 +3,17 @@ import { getDb } from "@/lib/db/client";
 import { strategies } from "@/lib/db/schema";
 import type { Strategy } from "@/lib/schemas/strategy";
 
+export async function getStrategyById(
+  id: string,
+): Promise<{ id: string; output: Strategy; createdAt: Date } | null> {
+  const db = getDb();
+  const [row] = await db.select().from(strategies).where(eq(strategies.id, id));
+  if (!row) {
+    return null;
+  }
+  return { id: row.id, output: row.output as Strategy, createdAt: row.createdAt };
+}
+
 export async function getLatestStrategyForRun(
   runId: string,
 ): Promise<{ id: string; output: Strategy; createdAt: Date } | null> {
