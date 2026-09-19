@@ -66,7 +66,9 @@ vi.mock("@/lib/db/client", () => ({
   getDb: () => makeFakeDb(),
 }));
 
-const { createRun, resumeRun, runStages, StagePause } = await import("@/lib/pipeline/orchestrator");
+const { createRun, resumeRun, retryRun, runStages, StagePause } = await import(
+  "@/lib/pipeline/orchestrator"
+);
 
 beforeEach(() => {
   runRow = null;
@@ -228,5 +230,74 @@ describe("orchestrator pause/resume", () => {
 
     expect(nextStage.run).toHaveBeenCalledTimes(1);
     expect(runRow?.status).toBe("done");
+  });
+});
+
+describe("orchestrator retry", () => {
+  it("retries starting AT the failed stage (unlike resume, which starts after)", async () => {
+    let attempts = 0;
+    const flakyStage = {
+      name: "research",
+      run: vi.fn(async () => {
+        attempts += 1;
+        if (attempts === 1) throw new Error("research exploded");
+      }),
+    };
+    const nextStage = { name: "strategy", run: vi.fn(async () => {}) };
+
+    const run = await createRun(GOAL.id);
+    await runStages(run, [flakyStage, nextStage]);
+    expect(runRow?.status).toBe("failed");
+    expect(runRow?.error).toBe("research exploded");
+
+    await retryRun(run.id, [flakyStage, nextStage]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(flakyStage.run).toHaveBeenCalledTimes(2);
+    expect(nextStage.run).toHaveBeenCalledTimes(1);
+    expect(runRow?.status).toBe("done");
+  });
+
+  it("clears the stale error once the retried stage starts running", async () => {
+    let attempts = 0;
+    const flakyStage = {
+      name: "research",
+      run: vi.fn(async () => {
+        attempts += 1;
+        if (attempts === 1) throw new Error("research exploded");
+      }),
+    };
+
+    const run = await createRun(GOAL.id);
+    await runStages(run, [flakyStage]);
+    expect(runRow?.error).toBe("research exploded");
+
+    await retryRun(run.id, [flakyStage]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(runRow?.status).toBe("done");
+    expect(runRow?.error).toBeNull();
+  });
+
+  it("retryRun rejects if the run is not failed", async () => {
+    const run = await createRun(GOAL.id);
+    await runStages(run, []); // reaches done
+    await expect(retryRun(run.id, [])).rejects.toThrow(/not failed/i);
+  });
+
+  it("retryRun rejects if the failed stage isn't in the provided stage list", async () => {
+    const throwingStage = {
+      name: "research",
+      run: vi.fn(async () => {
+        throw new Error("boom");
+      }),
+    };
+    const run = await createRun(GOAL.id);
+    await runStages(run, [throwingStage]);
+    expect(runRow?.status).toBe("failed");
+
+    await expect(
+      retryRun(run.id, [{ name: "other", run: vi.fn(async () => {}) }]),
+    ).rejects.toThrow(/not in the registered stage list/i);
   });
 });

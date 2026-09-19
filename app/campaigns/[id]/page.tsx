@@ -12,6 +12,7 @@ import type { CampaignSpec } from "@/lib/schemas/campaignSpec";
 import { ActionsTimeline } from "./ActionsTimeline";
 import { AnalyticsPanel } from "./AnalyticsPanel";
 import { ConversionsChart } from "./ConversionsChart";
+import { DemoControls } from "./DemoControls";
 
 export default async function CampaignDashboardPage({
   params,
@@ -93,6 +94,7 @@ export default async function CampaignDashboardPage({
 
       <AnalyticsPanel campaignId={id} initialObservations={observations} />
       <ActionsTimeline actions={timelineActions} />
+      {process.env.NODE_ENV !== "production" && <DemoControls campaignId={id} />}
     </main>
   );
 }

@@ -54,9 +54,12 @@ export async function runStages(run: Run, stages: PipelineStage[] = STAGES): Pro
   };
 
   for (const stage of stages) {
+    // Clears any stale error from a previous failed attempt at this run (e.g. a retry) — without
+    // this, a successful retry would leave old error text sitting in the row even though status
+    // has moved past "failed".
     await db
       .update(runs)
-      .set({ stage: stage.name, status: "running" })
+      .set({ stage: stage.name, status: "running", error: null })
       .where(eq(runs.id, run.id));
 
     try {
@@ -118,6 +121,32 @@ export async function resumeRun(runId: string, stages: PipelineStage[] = STAGES)
   }
 
   const remainingStages = stages.slice(pausedIndex + 1);
+  runStages(run, remainingStages).catch((error: unknown) => {
+    console.error(`runStages crashed outside its own error handling for run ${run.id}`, error);
+  });
+
+  return run;
+}
+
+/** Re-runs a failed run starting AT the stage that failed (unlike resumeRun, which starts AFTER
+ * the paused stage — a failed stage never completed, so retrying should attempt it again, not
+ * skip it). */
+export async function retryRun(runId: string, stages: PipelineStage[] = STAGES): Promise<Run> {
+  const db = getDb();
+  const [run] = await db.select().from(runs).where(eq(runs.id, runId));
+  if (!run) {
+    throw new Error(`Run ${runId} not found`);
+  }
+  if (run.status !== "failed") {
+    throw new Error(`Run ${runId} is not failed (status: ${run.status})`);
+  }
+
+  const failedIndex = stages.findIndex((stage) => stage.name === run.stage);
+  if (failedIndex === -1) {
+    throw new Error(`Cannot retry: stage "${run.stage}" is not in the registered stage list`);
+  }
+
+  const remainingStages = stages.slice(failedIndex);
   runStages(run, remainingStages).catch((error: unknown) => {
     console.error(`runStages crashed outside its own error handling for run ${run.id}`, error);
   });

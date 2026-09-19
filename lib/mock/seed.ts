@@ -8,18 +8,22 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import {
   actions,
+  approvals,
   campaignMetrics,
   campaigns,
   creatives,
   goals,
+  llmCalls,
   mockCompetitors,
   mockReviews,
   mockSearchFixtures,
   observations,
+  policyDecisions,
   recommendations,
   researchReports,
   runs,
   strategies,
+  toolCalls,
   businesses,
 } from "@/lib/db/schema";
 import { CampaignSpecSchema, type CampaignSpec } from "@/lib/schemas/campaignSpec";
@@ -123,7 +127,10 @@ async function main() {
   const rng = createRng("growthos-seed-v1");
 
   await db.transaction(async (tx) => {
+    // Clears everything this app writes, not just the mock-world tables — a demo reset should
+    // leave /system and /policy clean too, not just the seeded business data.
     await tx.delete(actions);
+    await tx.delete(approvals);
     await tx.delete(recommendations);
     await tx.delete(observations);
     await tx.delete(campaignMetrics);
@@ -131,8 +138,11 @@ async function main() {
     await tx.delete(creatives);
     await tx.delete(strategies);
     await tx.delete(researchReports);
+    await tx.delete(llmCalls);
+    await tx.delete(toolCalls);
     await tx.delete(runs);
     await tx.delete(goals);
+    await tx.delete(policyDecisions);
     await tx.delete(mockReviews);
     await tx.delete(mockCompetitors);
     await tx.delete(mockSearchFixtures);
@@ -295,6 +305,7 @@ async function main() {
   });
 
   console.log("Seed complete: 1 business, 8 competitors, 60 reviews, 40 historical campaigns.");
+  console.log("Also used as `pnpm demo:reset` — open http://localhost:3000/onboarding to start a demo.");
 
   const sampleReviews = await db.select().from(mockReviews).limit(5);
   console.log("\nSample reviews:");

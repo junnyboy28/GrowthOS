@@ -46,6 +46,8 @@ const STAGE_STYLE: Record<StageState, { symbol: string; color: string }> = {
 export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: RunStatusProps) {
   const [run, setRun] = useState(initialRun);
   const [llmCalls, setLlmCalls] = useState(initialLlmCalls);
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isActive(run)) return;
@@ -58,6 +60,22 @@ export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: Ru
     }, 2000);
     return () => clearInterval(interval);
   }, [run, runId]);
+
+  async function handleRetry() {
+    setRetrying(true);
+    setRetryError(null);
+    try {
+      const res = await fetch(`/api/runs/${runId}/retry`, { method: "POST" });
+      const data: { run?: Run; error?: string } = await res.json();
+      if (!res.ok || !data.run) {
+        setRetryError(data.error ?? "Failed to retry");
+        return;
+      }
+      setRun(data.run);
+    } finally {
+      setRetrying(false);
+    }
+  }
 
   const totalCost = llmCalls.reduce((sum, call) => sum + Number(call.costInr), 0);
 
@@ -93,6 +111,18 @@ export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: Ru
           Started {new Date(run.startedAt).toLocaleString()}
           {run.finishedAt && ` · Finished ${new Date(run.finishedAt).toLocaleString()}`}
         </p>
+        {run.status === "failed" && (
+          <div className="mt-2">
+            <button
+              onClick={handleRetry}
+              disabled={retrying}
+              className="rounded bg-black px-3 py-1 text-sm text-white disabled:opacity-50"
+            >
+              {retrying ? "Retrying…" : `Retry ${run.stage}`}
+            </button>
+            {retryError && <p className="mt-1 text-sm text-red-600">{retryError}</p>}
+          </div>
+        )}
       </section>
 
       <section>

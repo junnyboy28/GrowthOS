@@ -9,6 +9,7 @@
     "start": "next start",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx lib/mock/seed.ts",
+    "demo:reset": "tsx lib/mock/seed.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."

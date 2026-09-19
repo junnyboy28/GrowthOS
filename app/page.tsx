@@ -34,6 +34,9 @@ export default async function Home() {
         <Link href="/approvals" className="text-blue-600 hover:underline">
           Approvals
         </Link>
+        <Link href="/system" className="text-blue-600 hover:underline">
+          System
+        </Link>
       </div>
     </main>
   );
