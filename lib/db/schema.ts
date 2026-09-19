@@ -74,9 +74,9 @@ export const creatives = pgTable("creatives", {
 
 export const campaigns = pgTable("campaigns", {
   id: uuid("id").defaultRandom().primaryKey(),
-  /** Nullable: MockMetaAds.createCampaign(spec) — per the documented AdsPlatform interface — has no
-   * strategy id to attach. The real pipeline (Phase 6) sets this when it persists the row itself. */
-  strategyId: uuid("strategy_id").references(() => strategies.id),
+  strategyId: uuid("strategy_id")
+    .notNull()
+    .references(() => strategies.id),
   spec: jsonb("spec").notNull(),
   externalId: text("external_id"),
   status: text("status").notNull().default("pending_launch"),
@@ -217,3 +217,6 @@ export type MockCompetitorRow = typeof mockCompetitors.$inferSelect;
 export type MockReviewRow = typeof mockReviews.$inferSelect;
 export type MockSearchFixtureRow = typeof mockSearchFixtures.$inferSelect;
 export type LlmCallRow = typeof llmCalls.$inferSelect;
+export type PolicyDecisionRow = typeof policyDecisions.$inferSelect;
+export type ApprovalRow = typeof approvals.$inferSelect;
+export type ActionRow = typeof actions.$inferSelect;

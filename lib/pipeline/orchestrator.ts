@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { goals, runs, type Run } from "@/lib/db/schema";
+import { campaignStage } from "./campaign";
 import { contentStage } from "./content";
 import { researchStage } from "./research";
 import { StagePause, type PipelineStage } from "./stage";
@@ -14,6 +15,7 @@ export const STAGES: PipelineStage[] = [
   { name: "research", run: researchStage },
   { name: "strategy", run: strategyStage },
   { name: "content", run: contentStage },
+  { name: "campaign", run: campaignStage },
 ];
 
 export const STAGE_NAMES: readonly string[] = STAGES.map((stage) => stage.name);

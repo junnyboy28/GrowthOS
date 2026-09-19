@@ -1,4 +1,5 @@
 import { sql } from "drizzle-orm";
+import Link from "next/link";
 import { getDb } from "@/lib/db/client";
 
 async function getDbStatus(): Promise<{ ok: boolean; message: string }> {
@@ -23,6 +24,14 @@ export default async function Home() {
       <p className={status.ok ? "text-green-600" : "text-red-600"}>
         Database: {status.ok ? "connected" : `error — ${status.message}`}
       </p>
+      <div className="flex gap-4 text-sm">
+        <Link href="/onboarding" className="text-blue-600 hover:underline">
+          Onboard a business
+        </Link>
+        <Link href="/policy" className="text-blue-600 hover:underline">
+          Policy log
+        </Link>
+      </div>
     </main>
   );
 }

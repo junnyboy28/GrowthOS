@@ -1,7 +1,45 @@
-import { eq, inArray } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
-import { campaignMetrics, campaigns, runs, strategies } from "@/lib/db/schema";
+import { businesses, campaignMetrics, campaigns, runs, strategies, type Business, type CampaignRow } from "@/lib/db/schema";
 import type { CampaignSpec } from "@/lib/schemas/campaignSpec";
+
+/** The most recent campaign generated for a run (there's normally exactly one). */
+export async function getCampaignForRun(runId: string): Promise<CampaignRow | null> {
+  const db = getDb();
+  const [row] = await db
+    .select({ campaign: campaigns })
+    .from(campaigns)
+    .innerJoin(strategies, eq(strategies.id, campaigns.strategyId))
+    .where(eq(strategies.runId, runId))
+    .orderBy(desc(campaigns.createdAt))
+    .limit(1);
+
+  return row?.campaign ?? null;
+}
+
+export interface CampaignWithBusiness {
+  campaign: CampaignRow;
+  business: Business;
+}
+
+/** Walks campaigns -> strategies -> runs -> businesses, since campaigns has no direct business link. */
+export async function getCampaignWithBusinessContext(
+  campaignId: string,
+): Promise<CampaignWithBusiness | null> {
+  const db = getDb();
+  const [row] = await db
+    .select({ campaign: campaigns, business: businesses })
+    .from(campaigns)
+    .innerJoin(strategies, eq(strategies.id, campaigns.strategyId))
+    .innerJoin(runs, eq(runs.id, strategies.runId))
+    .innerJoin(businesses, eq(businesses.id, runs.businessId))
+    .where(eq(campaigns.id, campaignId));
+
+  if (!row) {
+    return null;
+  }
+  return { campaign: row.campaign, business: row.business };
+}
 
 export interface HistoricalCampaignSummary {
   campaignId: string;

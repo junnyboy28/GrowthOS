@@ -23,18 +23,11 @@ async function getCampaignByExternalId(externalId: string) {
 }
 
 export class MockMetaAds implements AdsPlatform {
-  async createCampaign(spec: CampaignSpec): Promise<{ externalId: string }> {
-    const db = getDb();
-    const externalId = generateExternalId();
-    await db.insert(campaigns).values({
-      strategyId: null,
-      spec,
-      externalId,
-      status: "live",
-      dailyBudget: Math.round(spec.daily_budget),
-      creativeWeights: null,
-    });
-    return { externalId };
+  /** Purely returns a fresh external id — mirrors a real ad platform, which has no business
+   * managing our own `campaigns` table. The caller (execute.ts) owns updating its own row with
+   * this id; this method never writes to our DB. */
+  async createCampaign(_spec: CampaignSpec): Promise<{ externalId: string }> {
+    return { externalId: generateExternalId() };
   }
 
   async updateBudget(externalId: string, dailyBudget: number): Promise<void> {
