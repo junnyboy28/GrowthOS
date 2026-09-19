@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import { getResearchReportForRun } from "@/lib/db/queries/research";
 import { getRunWithLlmCalls } from "@/lib/db/queries/runs";
+import { getLatestStrategyForRun } from "@/lib/db/queries/strategies";
 import { STAGE_NAMES } from "@/lib/pipeline/orchestrator";
 import { ResearchCards } from "./ResearchCards";
 import { RunStatus } from "./RunStatus";
+import { StrategyPanel } from "./StrategyPanel";
 
 export default async function RunPage({
   params,
@@ -15,7 +17,10 @@ export default async function RunPage({
   if (!result) {
     notFound();
   }
-  const research = await getResearchReportForRun(id);
+  const [research, strategy] = await Promise.all([
+    getResearchReportForRun(id),
+    getLatestStrategyForRun(id),
+  ]);
 
   return (
     <main className="mx-auto max-w-4xl p-8">
@@ -28,6 +33,7 @@ export default async function RunPage({
         stageNames={STAGE_NAMES}
       />
       {research && <ResearchCards output={research.output} />}
+      <StrategyPanel runId={id} initialStrategy={strategy} />
     </main>
   );
 }

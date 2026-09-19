@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { goals, runs, type Run } from "@/lib/db/schema";
 import { researchStage } from "./research";
+import { strategyStage } from "./strategy";
 
 export interface StageContext {
   runId: string;
@@ -15,7 +16,10 @@ export interface PipelineStage {
 }
 
 /** Registered in order. Adding a stage is a one-line change here — nothing else needs to know about it. */
-export const STAGES: PipelineStage[] = [{ name: "research", run: researchStage }];
+export const STAGES: PipelineStage[] = [
+  { name: "research", run: researchStage },
+  { name: "strategy", run: strategyStage },
+];
 
 export const STAGE_NAMES: readonly string[] = STAGES.map((stage) => stage.name);
 

@@ -1,5 +1,16 @@
 import { z } from "zod";
 
+/** Closed set, validated in stage code (not the zod schema) so it gets its own retry cycle —
+ * mirroring how research.ts validates source_ids against the evidence bundle. */
+export const CHANNELS = [
+  "meta_ads",
+  "instagram_organic",
+  "google_search_ads",
+  "whatsapp_broadcast",
+  "google_business_profile",
+] as const;
+export type Channel = (typeof CHANNELS)[number];
+
 export const StrategySchema = z.object({
   objective: z.string(),
   audience: z.string(),
