@@ -2,6 +2,8 @@
 
 import { useActionState, useRef } from "react";
 import { SEED_BUSINESS } from "@/lib/mock/data/business";
+import { Button } from "@/components/ui/Button";
+import { Field, Input, Label, Select, Textarea } from "@/components/ui/Field";
 import { createBusinessAction, type ActionState } from "./actions";
 
 const INDUSTRIES = [
@@ -37,34 +39,19 @@ export function OnboardingForm() {
   }
 
   return (
-    <form action={formAction} className="flex max-w-lg flex-col gap-4">
-      <button
-        type="button"
-        onClick={handlePrefill}
-        className="self-start rounded border border-gray-400 px-3 py-1 text-sm hover:bg-gray-100"
-      >
+    <form action={formAction} className="flex flex-col gap-5">
+      <Button type="button" variant="secondary" size="sm" onClick={handlePrefill} className="self-start">
         Prefill from seeded restaurant
-      </button>
+      </Button>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Business name</span>
-        <input
-          ref={nameRef}
-          name="name"
-          required
-          className="rounded border border-gray-300 px-3 py-2"
-        />
-      </label>
+      <Field>
+        <Label>Business name</Label>
+        <Input ref={nameRef} name="name" required />
+      </Field>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Industry</span>
-        <select
-          ref={industryRef}
-          name="industry"
-          required
-          defaultValue=""
-          className="rounded border border-gray-300 px-3 py-2"
-        >
+      <Field>
+        <Label>Industry</Label>
+        <Select ref={industryRef} name="industry" required defaultValue="">
           <option value="" disabled>
             Select an industry
           </option>
@@ -73,62 +60,34 @@ export function OnboardingForm() {
               {industry.label}
             </option>
           ))}
-        </select>
-      </label>
+        </Select>
+      </Field>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Location</span>
-        <input
-          ref={locationRef}
-          name="location"
-          required
-          className="rounded border border-gray-300 px-3 py-2"
-        />
-      </label>
+      <Field>
+        <Label>Location</Label>
+        <Input ref={locationRef} name="location" required />
+      </Field>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Monthly budget (₹)</span>
-        <input
-          ref={budgetRef}
-          name="monthlyBudget"
-          type="number"
-          min="0"
-          step="1"
-          required
-          className="rounded border border-gray-300 px-3 py-2"
-        />
-      </label>
+      <Field>
+        <Label>Monthly budget (₹)</Label>
+        <Input ref={budgetRef} name="monthlyBudget" type="number" min="0" step="1" required />
+      </Field>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Goal</span>
-        <textarea
-          ref={goalRef}
-          name="goalText"
-          required
-          rows={3}
-          className="rounded border border-gray-300 px-3 py-2"
-        />
-      </label>
+      <Field>
+        <Label>Goal</Label>
+        <Textarea ref={goalRef} name="goalText" required rows={3} />
+      </Field>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Brand notes (optional)</span>
-        <textarea
-          ref={brandNotesRef}
-          name="brandNotes"
-          rows={3}
-          className="rounded border border-gray-300 px-3 py-2"
-        />
-      </label>
+      <Field>
+        <Label>Brand notes (optional)</Label>
+        <Textarea ref={brandNotesRef} name="brandNotes" rows={3} />
+      </Field>
 
       {state.error && <p className="text-sm text-red-600">{state.error}</p>}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-      >
+      <Button type="submit" disabled={pending} className="self-start">
         {pending ? "Creating…" : "Create business"}
-      </button>
+      </Button>
     </form>
   );
 }

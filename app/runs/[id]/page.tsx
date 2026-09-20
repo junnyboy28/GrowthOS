@@ -5,6 +5,7 @@ import { getResearchReportForRun } from "@/lib/db/queries/research";
 import { getRunWithLlmCalls } from "@/lib/db/queries/runs";
 import { getLatestStrategyForRun } from "@/lib/db/queries/strategies";
 import { STAGE_NAMES } from "@/lib/pipeline/orchestrator";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { CampaignPanel } from "./CampaignPanel";
 import { CreativesPanel } from "./CreativesPanel";
 import { ResearchCards } from "./ResearchCards";
@@ -29,9 +30,12 @@ export default async function RunPage({
   ]);
 
   return (
-    <main className="mx-auto max-w-4xl p-8">
-      <h1 className="text-2xl font-bold">Run {result.run.id.slice(0, 8)}</h1>
-      <p className="text-sm text-gray-600">Goal: {result.goalText}</p>
+    <main className="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10">
+      <PageHeader
+        eyebrow="Run"
+        title={`Run ${result.run.id.slice(0, 8)}`}
+        description={`Goal: ${result.goalText}`}
+      />
       <RunStatus
         runId={id}
         initialRun={result.run}

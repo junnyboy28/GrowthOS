@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { Recommendation } from "@/lib/schemas/recommendation";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card, CardBody } from "@/components/ui/Card";
+import { IconAlertTriangle, IconCheck, IconX } from "@/components/icons";
 
 export interface ApprovalItem {
   recommendationId: string;
@@ -36,53 +40,56 @@ export function ApprovalCard({ item }: { item: ApprovalItem }) {
 
   if (status !== "pending") {
     return (
-      <div className="rounded border border-gray-200 p-4 text-sm text-gray-500">
-        {item.output.action} for {item.businessName} — {status}
-      </div>
+      <Card>
+        <CardBody className="flex items-center justify-between text-sm text-slate-500">
+          <span>
+            {item.output.action} for {item.businessName}
+          </span>
+          <Badge tone={status === "approved" ? "success" : "danger"}>{status}</Badge>
+        </CardBody>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded border border-gray-200 p-4 text-sm">
-      <div className="flex items-center justify-between">
-        <p className="font-medium">{item.output.action}</p>
-        <Link href={`/campaigns/${item.campaignId}`} className="text-xs text-blue-600 hover:underline">
-          {item.businessName}
-        </Link>
-      </div>
-      <p className="mt-1 text-gray-700">
-        <span className="font-medium">Expected impact:</span> {item.output.expected_impact}
-      </p>
-      <p className="text-gray-700">
-        <span className="font-medium">Confidence:</span> {(item.output.confidence * 100).toFixed(0)}%
-      </p>
-      <p className="text-gray-700">
-        <span className="font-medium">Rationale:</span> {item.output.rationale}
-      </p>
-      <p className="mt-1 text-xs text-amber-700">
-        <span className="font-medium">Policy:</span> {item.policyReason}
-      </p>
-      <pre className="mt-1 overflow-x-auto rounded bg-gray-50 p-2 text-xs text-gray-600">
-        {JSON.stringify(item.output.params, null, 2)}
-      </pre>
+    <Card>
+      <CardBody className="flex flex-col gap-2 text-sm">
+        <div className="flex items-center justify-between">
+          <p className="font-medium text-slate-900">{item.output.action}</p>
+          <Link href={`/campaigns/${item.campaignId}`} className="text-xs font-medium text-indigo-600 hover:text-indigo-700">
+            {item.businessName}
+          </Link>
+        </div>
+        <p className="text-slate-600">
+          <span className="font-medium text-slate-900">Expected impact:</span> {item.output.expected_impact}
+        </p>
+        <p className="text-slate-600">
+          <span className="font-medium text-slate-900">Confidence:</span>{" "}
+          {(item.output.confidence * 100).toFixed(0)}%
+        </p>
+        <p className="text-slate-600">
+          <span className="font-medium text-slate-900">Rationale:</span> {item.output.rationale}
+        </p>
+        <p className="flex items-center gap-1.5 text-xs text-amber-700">
+          <IconAlertTriangle className="h-3.5 w-3.5 shrink-0" />
+          <span className="font-medium">Policy:</span> {item.policyReason}
+        </p>
+        <pre className="overflow-x-auto rounded-md bg-slate-50 p-2.5 text-xs text-slate-600">
+          {JSON.stringify(item.output.params, null, 2)}
+        </pre>
 
-      <div className="mt-3 flex gap-2">
-        <button
-          onClick={() => handle("approve")}
-          disabled={pending}
-          className="rounded bg-green-600 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
-        >
-          Approve
-        </button>
-        <button
-          onClick={() => handle("reject")}
-          disabled={pending}
-          className="rounded bg-red-600 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
-        >
-          Reject
-        </button>
-      </div>
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
-    </div>
+        <div className="mt-1 flex gap-2">
+          <Button variant="success" size="sm" onClick={() => handle("approve")} disabled={pending}>
+            <IconCheck className="h-3.5 w-3.5" />
+            Approve
+          </Button>
+          <Button variant="danger" size="sm" onClick={() => handle("reject")} disabled={pending}>
+            <IconX className="h-3.5 w-3.5" />
+            Reject
+          </Button>
+        </div>
+        {error && <p className="text-xs text-red-600">{error}</p>}
+      </CardBody>
+    </Card>
   );
 }

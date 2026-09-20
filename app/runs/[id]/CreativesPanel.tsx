@@ -3,16 +3,28 @@
 import { useState } from "react";
 import type { CreativeRow } from "@/lib/db/schema";
 import type { Creative } from "@/lib/schemas/creativeSet";
+import { Badge, type Tone } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card, CardBody, Section } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { cn } from "@/components/ui/cn";
+import { IconCheck, IconRefresh, IconSparkles, IconX } from "@/components/icons";
 
 interface CreativesPanelProps {
   runId: string;
   initialCreatives: CreativeRow[];
 }
 
-const STATUS_STYLE: Record<string, string> = {
-  pending: "border-gray-200",
-  approved: "border-green-400",
-  rejected: "border-red-300 opacity-60",
+const STATUS_BORDER: Record<string, string> = {
+  pending: "border-slate-200",
+  approved: "border-emerald-300",
+  rejected: "border-red-200 opacity-60",
+};
+
+const STATUS_TONE: Record<string, Tone> = {
+  pending: "neutral",
+  approved: "success",
+  rejected: "danger",
 };
 
 export function CreativesPanel({ runId, initialCreatives }: CreativesPanelProps) {
@@ -72,80 +84,80 @@ export function CreativesPanel({ runId, initialCreatives }: CreativesPanelProps)
 
   if (creatives.length === 0) {
     return (
-      <section className="mt-6">
-        <h2 className="text-lg font-semibold">Creatives</h2>
-        <p className="mt-2 text-sm text-gray-500">No creatives yet.</p>
-      </section>
+      <Section title="Creatives">
+        <EmptyState icon={IconSparkles} title="No creatives yet" />
+      </Section>
     );
   }
 
   return (
-    <section className="mt-6">
-      <h2 className="text-lg font-semibold">Creatives</h2>
-      <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2">
+    <Section title="Creatives">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {creatives.map((creativeRow) => {
           const creative = creativeRow.output as Creative;
           const busy = pendingId === creativeRow.id;
           return (
-            <div
+            <Card
               key={creativeRow.id}
-              className={`flex flex-col gap-2 rounded border p-4 text-sm ${STATUS_STYLE[creativeRow.status] ?? "border-gray-200"}`}
+              className={cn(STATUS_BORDER[creativeRow.status] ?? "border-slate-200")}
             >
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
-                  {creative.format}
-                </span>
-                <span className="text-xs font-medium uppercase text-gray-500">
-                  {creativeRow.status}
-                </span>
-              </div>
-              <p className="font-medium">{creative.headline}</p>
-              <p className="italic text-gray-700">{creative.hook}</p>
-              <p className="text-gray-700">{creative.caption}</p>
-              <p className="text-xs text-gray-500">CTA: {creative.cta}</p>
-              <p className="text-xs text-gray-400">Image prompt: {creative.image_prompt}</p>
+              <CardBody className="flex flex-col gap-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <Badge tone="neutral">{creative.format}</Badge>
+                  <Badge tone={STATUS_TONE[creativeRow.status] ?? "neutral"}>
+                    {creativeRow.status}
+                  </Badge>
+                </div>
+                <p className="font-medium text-slate-900">{creative.headline}</p>
+                <p className="italic text-slate-600">{creative.hook}</p>
+                <p className="text-slate-600">{creative.caption}</p>
+                <p className="text-xs text-slate-500">CTA: {creative.cta}</p>
+                <p className="text-xs text-slate-400">Image prompt: {creative.image_prompt}</p>
 
-              <div className="mt-2 flex flex-wrap gap-2">
-                <button
-                  onClick={() => handleDecision(creativeRow.id, "approved")}
-                  disabled={busy}
-                  className="rounded bg-green-600 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
-                >
-                  Approve
-                </button>
-                <button
-                  onClick={() => handleDecision(creativeRow.id, "rejected")}
-                  disabled={busy}
-                  className="rounded bg-red-600 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
-                >
-                  Reject
-                </button>
-                <button
-                  onClick={() => handleRegenerate(creativeRow.id)}
-                  disabled={busy}
-                  className="rounded border border-gray-400 px-3 py-1 text-xs font-medium disabled:opacity-50"
-                >
-                  {busy ? "Working…" : "Regenerate this one"}
-                </button>
-              </div>
-            </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Button
+                    variant="success"
+                    size="sm"
+                    onClick={() => handleDecision(creativeRow.id, "approved")}
+                    disabled={busy}
+                  >
+                    <IconCheck className="h-3.5 w-3.5" />
+                    Approve
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDecision(creativeRow.id, "rejected")}
+                    disabled={busy}
+                  >
+                    <IconX className="h-3.5 w-3.5" />
+                    Reject
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleRegenerate(creativeRow.id)}
+                    disabled={busy}
+                  >
+                    <IconRefresh className="h-3.5 w-3.5" />
+                    {busy ? "Working…" : "Regenerate"}
+                  </Button>
+                </div>
+              </CardBody>
+            </Card>
           );
         })}
       </div>
 
-      <div className="mt-4 flex items-center gap-3">
-        <button
-          onClick={handleContinue}
-          disabled={!hasApproved || continuePending || continued}
-          className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-        >
+      <div className="flex items-center gap-3">
+        <Button onClick={handleContinue} disabled={!hasApproved || continuePending || continued}>
           {continued ? "Continuing…" : continuePending ? "Continuing…" : "Continue"}
-        </button>
+        </Button>
         {!hasApproved && !continued && (
-          <span className="text-xs text-gray-500">Approve at least one creative to continue.</span>
+          <span className="text-xs text-slate-500">Approve at least one creative to continue.</span>
         )}
         {continueError && <span className="text-sm text-red-600">{continueError}</span>}
       </div>
-    </section>
+    </Section>
   );
 }

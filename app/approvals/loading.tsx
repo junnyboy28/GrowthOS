@@ -1,7 +1,9 @@
+import { SkeletonPage } from "@/components/ui/Skeleton";
+
 export default function Loading() {
   return (
-    <main className="mx-auto max-w-3xl p-8">
-      <p className="text-sm text-gray-500">Loading approvals…</p>
+    <main className="mx-auto max-w-3xl px-6 py-10">
+      <SkeletonPage rows={3} />
     </main>
   );
 }

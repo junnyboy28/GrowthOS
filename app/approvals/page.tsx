@@ -2,6 +2,9 @@ import { getPendingRecommendationsWithContext } from "@/lib/db/queries/recommend
 import { buildAdapterParams } from "@/lib/loop/execute";
 import { evaluate } from "@/lib/policy/evaluate";
 import type { Recommendation } from "@/lib/schemas/recommendation";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { IconInbox } from "@/components/icons";
 import { ApprovalCard, type ApprovalItem } from "./ApprovalCard";
 
 export default async function ApprovalsPage() {
@@ -25,14 +28,17 @@ export default async function ApprovalsPage() {
   });
 
   return (
-    <main className="mx-auto max-w-3xl p-8">
-      <h1 className="text-2xl font-bold">Approvals</h1>
-      <p className="text-sm text-gray-600">Recommendations awaiting a decision.</p>
+    <main className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-10">
+      <PageHeader
+        eyebrow="Human in the loop"
+        title="Approvals"
+        description="Recommendations awaiting a decision."
+      />
 
       {items.length === 0 ? (
-        <p className="mt-6 text-sm text-gray-500">Nothing pending.</p>
+        <EmptyState icon={IconInbox} title="Nothing pending" description="Everything caught up." />
       ) : (
-        <div className="mt-6 flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           {items.map((item) => (
             <ApprovalCard key={item.approvalId} item={item} />
           ))}

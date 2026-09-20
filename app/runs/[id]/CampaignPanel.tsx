@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import type { CampaignRow } from "@/lib/db/schema";
 import type { CampaignSpec } from "@/lib/schemas/campaignSpec";
+import { StatusBadge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card, CardBody, Section } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { IconExternalLink, IconPlay, IconTrendingUp } from "@/components/icons";
 
 interface CampaignPanelProps {
   initialCampaign: CampaignRow | null;
@@ -61,69 +66,74 @@ export function CampaignPanel({ initialCampaign }: CampaignPanelProps) {
 
   if (!campaign) {
     return (
-      <section className="mt-6">
-        <h2 className="text-lg font-semibold">Campaign</h2>
-        <p className="mt-2 text-sm text-gray-500">No campaign yet.</p>
-      </section>
+      <Section title="Campaign">
+        <EmptyState icon={IconTrendingUp} title="No campaign yet" />
+      </Section>
     );
   }
 
   const spec = campaign.spec as CampaignSpec;
 
   return (
-    <section className="mt-6">
-      <h2 className="text-lg font-semibold">Campaign</h2>
-      <div className="mt-2 flex flex-col gap-2 rounded border border-gray-200 p-4 text-sm">
-        <p className="font-medium">{spec.objective}</p>
-        <p className="text-gray-700">Audience: {spec.audience}</p>
-        <p className="text-gray-700">
-          ₹{spec.daily_budget}/day · {spec.cta} · {spec.creative_ids.length} creative(s)
-        </p>
-        <p className="text-gray-700">
-          {spec.schedule.start_date} → {spec.schedule.end_date ?? "ongoing"}
-        </p>
-        <p className="text-xs text-gray-500">
-          Status: <span className="font-medium">{campaign.status}</span>
-          {campaign.externalId && ` · External id: ${campaign.externalId}`}
-        </p>
-        <Link href={`/campaigns/${campaign.id}`} className="text-xs text-blue-600 hover:underline">
-          View dashboard
-        </Link>
-
-        {campaign.status === "pending_launch" && (
-          <div className="mt-2 flex flex-col gap-2">
-            {!outcome && (
-              <button
-                onClick={handleLaunch}
-                disabled={pending}
-                className="self-start rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-              >
-                {pending ? "Evaluating…" : "Launch campaign"}
-              </button>
-            )}
-
-            {outcome && (
-              <div className="rounded border border-gray-200 p-3">
-                <p className="text-xs font-medium uppercase text-gray-500">
-                  Policy decision: {outcome.status}
-                </p>
-                {outcome.reason && <p className="mt-1 text-gray-700">{outcome.reason}</p>}
-                {outcome.status === "require_approval" && (
-                  <button
-                    onClick={handleApprove}
-                    disabled={pending}
-                    className="mt-2 rounded bg-green-600 px-4 py-2 text-sm text-white disabled:opacity-50"
-                  >
-                    {pending ? "Approving…" : "Approve"}
-                  </button>
-                )}
-              </div>
-            )}
-
-            {error && <p className="text-sm text-red-600">{error}</p>}
+    <Section title="Campaign">
+      <Card>
+        <CardBody className="flex flex-col gap-2 text-sm">
+          <p className="font-medium text-slate-900">{spec.objective}</p>
+          <p className="text-slate-600">Audience: {spec.audience}</p>
+          <p className="text-slate-600">
+            ₹{spec.daily_budget}/day · {spec.cta} · {spec.creative_ids.length} creative(s)
+          </p>
+          <p className="text-slate-600">
+            {spec.schedule.start_date} → {spec.schedule.end_date ?? "ongoing"}
+          </p>
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <StatusBadge status={campaign.status} />
+            {campaign.externalId && <span>External id: {campaign.externalId}</span>}
           </div>
-        )}
-      </div>
-    </section>
+          <Link
+            href={`/campaigns/${campaign.id}`}
+            className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+          >
+            View dashboard
+            <IconExternalLink className="h-3 w-3" />
+          </Link>
+
+          {campaign.status === "pending_launch" && (
+            <div className="mt-2 flex flex-col gap-2">
+              {!outcome && (
+                <Button size="sm" onClick={handleLaunch} disabled={pending} className="self-start">
+                  <IconPlay className="h-3.5 w-3.5" />
+                  {pending ? "Evaluating…" : "Launch campaign"}
+                </Button>
+              )}
+
+              {outcome && (
+                <Card className="border-slate-100 shadow-none">
+                  <CardBody className="p-3">
+                    <p className="text-xs font-medium uppercase text-slate-500">
+                      Policy decision: {outcome.status}
+                    </p>
+                    {outcome.reason && <p className="mt-1 text-slate-700">{outcome.reason}</p>}
+                    {outcome.status === "require_approval" && (
+                      <Button
+                        variant="success"
+                        size="sm"
+                        onClick={handleApprove}
+                        disabled={pending}
+                        className="mt-2"
+                      >
+                        {pending ? "Approving…" : "Approve"}
+                      </Button>
+                    )}
+                  </CardBody>
+                </Card>
+              )}
+
+              {error && <p className="text-sm text-red-600">{error}</p>}
+            </div>
+          )}
+        </CardBody>
+      </Card>
+    </Section>
   );
 }

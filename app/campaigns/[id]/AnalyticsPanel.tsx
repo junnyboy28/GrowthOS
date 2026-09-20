@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import type { Observations } from "@/lib/schemas/observations";
+import { Button } from "@/components/ui/Button";
+import { Card, CardBody, Section } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { IconRefresh, IconSparkles } from "@/components/icons";
 
 interface ObservationsWithMeta {
   output: Observations;
@@ -39,44 +43,46 @@ export function AnalyticsPanel({ campaignId, initialObservations }: AnalyticsPan
   }
 
   return (
-    <section className="mt-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">AI insights</h2>
-        <button
-          onClick={handleRunAnalytics}
-          disabled={pending}
-          className="rounded bg-black px-3 py-1 text-sm text-white disabled:opacity-50"
-        >
+    <Section
+      title="AI insights"
+      action={
+        <Button size="sm" onClick={handleRunAnalytics} disabled={pending}>
+          <IconRefresh className="h-3.5 w-3.5" />
           {pending ? "Running…" : "Run analytics"}
-        </button>
-      </div>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        </Button>
+      }
+    >
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!observations ? (
-        <p className="mt-2 text-sm text-gray-500">No observations yet.</p>
+        <EmptyState icon={IconSparkles} title="No observations yet" />
       ) : (
-        <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="rounded border border-gray-200 p-4 text-sm">
-            <p className="text-xs font-medium uppercase text-gray-500">Interpretation</p>
-            <p className="mt-1 text-gray-700">{observations.output.interpretation}</p>
-            <p className="mt-2 text-xs text-gray-400">
-              Window {observations.output.window.start} → {observations.output.window.end}
-            </p>
-          </div>
-          <div className="rounded border border-gray-200 p-4 text-sm">
-            <p className="text-xs font-medium uppercase text-gray-500">Anomalies</p>
-            {observations.output.anomalies.length === 0 ? (
-              <p className="mt-1 text-gray-500">None flagged.</p>
-            ) : (
-              <ul className="mt-1 list-inside list-disc text-gray-700">
-                {observations.output.anomalies.map((anomaly, index) => (
-                  <li key={index}>{anomaly}</li>
-                ))}
-              </ul>
-            )}
-          </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Card>
+            <CardBody className="text-sm">
+              <p className="text-xs font-medium uppercase text-slate-500">Interpretation</p>
+              <p className="mt-1 text-slate-700">{observations.output.interpretation}</p>
+              <p className="mt-2 text-xs text-slate-400">
+                Window {observations.output.window.start} → {observations.output.window.end}
+              </p>
+            </CardBody>
+          </Card>
+          <Card>
+            <CardBody className="text-sm">
+              <p className="text-xs font-medium uppercase text-slate-500">Anomalies</p>
+              {observations.output.anomalies.length === 0 ? (
+                <p className="mt-1 text-slate-500">None flagged.</p>
+              ) : (
+                <ul className="mt-1 list-inside list-disc text-slate-700">
+                  {observations.output.anomalies.map((anomaly, index) => (
+                    <li key={index}>{anomaly}</li>
+                  ))}
+                </ul>
+              )}
+            </CardBody>
+          </Card>
         </div>
       )}
-    </section>
+    </Section>
   );
 }

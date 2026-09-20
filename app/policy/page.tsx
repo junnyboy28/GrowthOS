@@ -1,9 +1,15 @@
 import { getRecentActions, getRecentPolicyDecisions } from "@/lib/db/queries/policy";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Section } from "@/components/ui/Card";
+import { Badge, type Tone } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
+import { IconActivity, IconShield } from "@/components/icons";
 
-const DECISION_COLOR: Record<string, string> = {
-  allow: "text-green-700",
-  require_approval: "text-amber-700",
-  block: "text-red-700",
+const DECISION_TONE: Record<string, Tone> = {
+  allow: "success",
+  require_approval: "warning",
+  block: "danger",
 };
 
 export default async function PolicyPage() {
@@ -13,81 +19,72 @@ export default async function PolicyPage() {
   ]);
 
   return (
-    <main className="mx-auto max-w-4xl p-8">
-      <h1 className="text-2xl font-bold">Policy log</h1>
-      <p className="text-sm text-gray-600">
-        Every policy evaluation and every executed adapter action — the audit trail.
-      </p>
+    <main className="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10">
+      <PageHeader
+        eyebrow="Audit trail"
+        title="Policy log"
+        description="Every policy evaluation and every executed adapter action, in order."
+      />
 
-      <section className="mt-6">
-        <h2 className="text-lg font-semibold">Policy decisions</h2>
+      <Section title="Policy decisions">
         {decisions.length === 0 ? (
-          <p className="mt-2 text-sm text-gray-500">No policy decisions yet.</p>
+          <EmptyState icon={IconShield} title="No policy decisions yet" />
         ) : (
-          <table className="mt-2 w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-gray-600">
-                <th className="py-1 pr-4">When</th>
-                <th className="py-1 pr-4">Action</th>
-                <th className="py-1 pr-4">Decision</th>
-                <th className="py-1 pr-4">Rule</th>
-                <th className="py-1 pr-4">Reason</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <THead>
+              <TH>When</TH>
+              <TH>Action</TH>
+              <TH>Decision</TH>
+              <TH>Rule</TH>
+              <TH>Reason</TH>
+            </THead>
+            <TBody>
               {decisions.map((decision) => (
-                <tr key={decision.id} className="border-b border-gray-100 align-top">
-                  <td className="py-2 pr-4 text-xs text-gray-500">
-                    {decision.createdAt.toLocaleString()}
-                  </td>
-                  <td className="py-2 pr-4">{decision.action}</td>
-                  <td className={`py-2 pr-4 font-medium ${DECISION_COLOR[decision.decision] ?? ""}`}>
-                    {decision.decision}
-                  </td>
-                  <td className="py-2 pr-4 text-xs text-gray-500">{decision.ruleId}</td>
-                  <td className="py-2 pr-4 text-gray-700">{decision.reason}</td>
-                </tr>
+                <TR key={decision.id}>
+                  <TD className="text-xs text-slate-400">{decision.createdAt.toLocaleString()}</TD>
+                  <TD>{decision.action}</TD>
+                  <TD>
+                    <Badge tone={DECISION_TONE[decision.decision] ?? "neutral"}>{decision.decision}</Badge>
+                  </TD>
+                  <TD className="text-xs text-slate-400">{decision.ruleId}</TD>
+                  <TD>{decision.reason}</TD>
+                </TR>
               ))}
-            </tbody>
-          </table>
+            </TBody>
+          </Table>
         )}
-      </section>
+      </Section>
 
-      <section className="mt-8">
-        <h2 className="text-lg font-semibold">Executed actions</h2>
+      <Section title="Executed actions">
         {actions.length === 0 ? (
-          <p className="mt-2 text-sm text-gray-500">No actions executed yet.</p>
+          <EmptyState icon={IconActivity} title="No actions executed yet" />
         ) : (
-          <table className="mt-2 w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-gray-600">
-                <th className="py-1 pr-4">When</th>
-                <th className="py-1 pr-4">Adapter</th>
-                <th className="py-1 pr-4">Method</th>
-                <th className="py-1 pr-4">Before</th>
-                <th className="py-1 pr-4">After</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <THead>
+              <TH>When</TH>
+              <TH>Adapter</TH>
+              <TH>Method</TH>
+              <TH>Before</TH>
+              <TH>After</TH>
+            </THead>
+            <TBody>
               {actions.map((action) => (
-                <tr key={action.id} className="border-b border-gray-100 align-top">
-                  <td className="py-2 pr-4 text-xs text-gray-500">
-                    {action.createdAt.toLocaleString()}
-                  </td>
-                  <td className="py-2 pr-4">{action.adapter}</td>
-                  <td className="py-2 pr-4">{action.method}</td>
-                  <td className="py-2 pr-4 text-xs text-gray-500">
+                <TR key={action.id}>
+                  <TD className="text-xs text-slate-400">{action.createdAt.toLocaleString()}</TD>
+                  <TD>{action.adapter}</TD>
+                  <TD>{action.method}</TD>
+                  <TD className="text-xs text-slate-400">
                     {action.before ? JSON.stringify(action.before) : "—"}
-                  </td>
-                  <td className="py-2 pr-4 text-xs text-gray-500">
+                  </TD>
+                  <TD className="text-xs text-slate-400">
                     {action.after ? JSON.stringify(action.after) : "—"}
-                  </td>
-                </tr>
+                  </TD>
+                </TR>
               ))}
-            </tbody>
-          </table>
+            </TBody>
+          </Table>
         )}
-      </section>
+      </Section>
     </main>
   );
 }

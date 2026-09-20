@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from "react";
 import type { LlmCallRow, Run } from "@/lib/db/schema";
+import { Button } from "@/components/ui/Button";
+import { Card, CardBody, Section } from "@/components/ui/Card";
+import { StatusBadge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
+import { IconCheck, IconClock, IconPause, IconRefresh, IconX } from "@/components/icons";
 
 interface RunStatusProps {
   runId: string;
@@ -35,12 +41,12 @@ function getStageState(name: string, run: Run, stageNames: readonly string[]): S
   return "pending";
 }
 
-const STAGE_STYLE: Record<StageState, { symbol: string; color: string }> = {
-  done: { symbol: "✓", color: "text-green-600" },
-  running: { symbol: "▶", color: "text-amber-600" },
-  failed: { symbol: "✗", color: "text-red-600" },
-  pending: { symbol: "○", color: "text-gray-400" },
-  awaiting_approval: { symbol: "⏸", color: "text-blue-600" },
+const STAGE_STYLE: Record<StageState, { icon: typeof IconCheck; color: string }> = {
+  done: { icon: IconCheck, color: "text-emerald-600" },
+  running: { icon: IconRefresh, color: "text-indigo-600" },
+  failed: { icon: IconX, color: "text-red-600" },
+  pending: { icon: IconClock, color: "text-slate-300" },
+  awaiting_approval: { icon: IconPause, color: "text-amber-600" },
 };
 
 export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: RunStatusProps) {
@@ -80,94 +86,88 @@ export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: Ru
   const totalCost = llmCalls.reduce((sum, call) => sum + Number(call.costInr), 0);
 
   return (
-    <div className="mt-6 flex flex-col gap-8">
-      <section>
-        <h2 className="text-lg font-semibold">Stage timeline</h2>
-        {stageNames.length === 0 ? (
-          <p className="mt-2 text-sm text-gray-500">
-            No stages registered yet — this run goes straight to done.
-          </p>
-        ) : (
-          <ol className="mt-2 flex flex-col gap-1">
-            {stageNames.map((name) => {
-              const state = getStageState(name, run, stageNames);
-              const style = STAGE_STYLE[state];
-              return (
-                <li key={name} className="flex items-center gap-2 text-sm">
-                  <span className={style.color}>{style.symbol}</span>
-                  {name}
-                </li>
-              );
-            })}
-          </ol>
-        )}
-        <p className="mt-3 text-sm">
-          Status: <StatusBadge status={run.status} />
-          {run.status === "failed" && run.error && (
-            <span className="text-red-600"> — {run.error}</span>
-          )}
-        </p>
-        <p className="text-xs text-gray-500">
-          Started {new Date(run.startedAt).toLocaleString()}
-          {run.finishedAt && ` · Finished ${new Date(run.finishedAt).toLocaleString()}`}
-        </p>
-        {run.status === "failed" && (
-          <div className="mt-2">
-            <button
-              onClick={handleRetry}
-              disabled={retrying}
-              className="rounded bg-black px-3 py-1 text-sm text-white disabled:opacity-50"
-            >
-              {retrying ? "Retrying…" : `Retry ${run.stage}`}
-            </button>
-            {retryError && <p className="mt-1 text-sm text-red-600">{retryError}</p>}
-          </div>
-        )}
-      </section>
+    <div className="flex flex-col gap-8">
+      <Section title="Stage timeline">
+        <Card>
+          <CardBody className="flex flex-col gap-4">
+            {stageNames.length === 0 ? (
+              <p className="text-sm text-slate-500">
+                No stages registered yet — this run goes straight to done.
+              </p>
+            ) : (
+              <ol className="flex flex-wrap items-center gap-2">
+                {stageNames.map((name, index) => {
+                  const state = getStageState(name, run, stageNames);
+                  const style = STAGE_STYLE[state];
+                  const Icon = style.icon;
+                  return (
+                    <li key={name} className="flex items-center gap-2">
+                      <span className={`flex items-center gap-1.5 text-sm ${style.color}`}>
+                        <Icon className="h-4 w-4" />
+                        <span className="text-slate-700">{name}</span>
+                      </span>
+                      {index < stageNames.length - 1 && (
+                        <span className="h-px w-6 bg-slate-200" />
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+            <div className="flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4">
+              <StatusBadge status={run.status} />
+              {run.status === "failed" && run.error && (
+                <span className="text-sm text-red-600">{run.error}</span>
+              )}
+              <span className="text-xs text-slate-400">
+                Started {new Date(run.startedAt).toLocaleString()}
+                {run.finishedAt && ` · Finished ${new Date(run.finishedAt).toLocaleString()}`}
+              </span>
+            </div>
+            {run.status === "failed" && (
+              <div>
+                <Button variant="secondary" size="sm" onClick={handleRetry} disabled={retrying}>
+                  <IconRefresh className="h-3.5 w-3.5" />
+                  {retrying ? "Retrying…" : `Retry ${run.stage}`}
+                </Button>
+                {retryError && <p className="mt-1 text-sm text-red-600">{retryError}</p>}
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      </Section>
 
-      <section>
-        <h2 className="text-lg font-semibold">
-          LLM calls {llmCalls.length > 0 && `(₹${totalCost.toFixed(4)} total)`}
-        </h2>
+      <Section
+        title="LLM calls"
+        description={llmCalls.length > 0 ? `₹${totalCost.toFixed(4)} total` : undefined}
+      >
         {llmCalls.length === 0 ? (
-          <p className="mt-2 text-sm text-gray-500">No LLM calls yet.</p>
+          <EmptyState icon={IconClock} title="No LLM calls yet" />
         ) : (
-          <table className="mt-2 w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-gray-600">
-                <th className="py-1 pr-4">Stage</th>
-                <th className="py-1 pr-4">Model</th>
-                <th className="py-1 pr-4">Tokens</th>
-                <th className="py-1 pr-4">Latency</th>
-                <th className="py-1 pr-4">Cost (₹)</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <THead>
+              <TH>Stage</TH>
+              <TH>Model</TH>
+              <TH>Tokens</TH>
+              <TH>Latency</TH>
+              <TH>Cost (₹)</TH>
+            </THead>
+            <TBody>
               {llmCalls.map((call) => (
-                <tr key={call.id} className="border-b border-gray-100">
-                  <td className="py-1 pr-4">{call.stage}</td>
-                  <td className="py-1 pr-4">{call.model}</td>
-                  <td className="py-1 pr-4">
+                <TR key={call.id}>
+                  <TD>{call.stage}</TD>
+                  <TD>{call.model}</TD>
+                  <TD>
                     {call.inputTokens} in / {call.outputTokens} out
-                  </td>
-                  <td className="py-1 pr-4">{call.latencyMs}ms</td>
-                  <td className="py-1 pr-4">{Number(call.costInr).toFixed(4)}</td>
-                </tr>
+                  </TD>
+                  <TD>{call.latencyMs}ms</TD>
+                  <TD>{Number(call.costInr).toFixed(4)}</TD>
+                </TR>
               ))}
-            </tbody>
-          </table>
+            </TBody>
+          </Table>
         )}
-      </section>
+      </Section>
     </div>
   );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const color =
-    status === "done"
-      ? "text-green-700"
-      : status === "failed"
-        ? "text-red-700"
-        : "text-amber-700";
-  return <span className={`font-medium ${color}`}>{status.replace(/_/g, " ")}</span>;
 }

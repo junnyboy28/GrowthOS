@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Goal, Run } from "@/lib/db/schema";
+import { Button } from "@/components/ui/Button";
+import { Card, CardBody } from "@/components/ui/Card";
+import { StatusBadge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { IconClock, IconPlay } from "@/components/icons";
 
 interface RunsPanelProps {
   goals: Goal[];
@@ -71,63 +76,63 @@ export function RunsPanel({ goals, initialRuns }: RunsPanelProps) {
   }
 
   return (
-    <div className="mt-2 flex flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <ul className="flex flex-col gap-3">
         {goals.map((goal) => {
           const latest = latestRunForGoal(goal.id);
           const busy = latest ? isActive(latest) : false;
           return (
-            <li key={goal.id} className="rounded border border-gray-200 p-4">
-              <p className="text-sm">{goal.text}</p>
-              <div className="mt-2 flex items-center gap-3">
-                <button
-                  onClick={() => handleStart(goal.id)}
-                  disabled={busy || startingGoalId === goal.id}
-                  className="rounded bg-black px-3 py-1 text-sm text-white disabled:opacity-50"
-                >
-                  {busy ? "Running…" : "Start Run"}
-                </button>
-                {latest && (
-                  <span className="text-xs text-gray-600">
-                    Latest: {latest.stage} / {latest.status}
-                  </span>
-                )}
-              </div>
+            <li key={goal.id}>
+              <Card>
+                <CardBody className="flex items-center justify-between gap-4">
+                  <p className="text-sm text-slate-700">{goal.text}</p>
+                  <div className="flex shrink-0 items-center gap-3">
+                    {latest && (
+                      <span className="text-xs text-slate-500">
+                        {latest.stage} · <StatusBadge status={latest.status} />
+                      </span>
+                    )}
+                    <Button
+                      size="sm"
+                      onClick={() => handleStart(goal.id)}
+                      disabled={busy || startingGoalId === goal.id}
+                    >
+                      <IconPlay className="h-3.5 w-3.5" />
+                      {busy ? "Running…" : "Start run"}
+                    </Button>
+                  </div>
+                </CardBody>
+              </Card>
             </li>
           );
         })}
       </ul>
 
       <div>
-        <h3 className="text-sm font-semibold text-gray-700">Runs</h3>
-        <ul className="mt-2 flex flex-col gap-2">
-          {runs.length === 0 && <li className="text-sm text-gray-500">No runs yet.</li>}
-          {runs.map((run) => (
-            <li
-              key={run.id}
-              className="flex items-center justify-between rounded border border-gray-200 px-3 py-2 text-sm"
-            >
-              <span>
-                <StatusBadge status={run.status} /> stage: {run.stage}
-                {run.error && <span className="ml-2 text-red-600">({run.error})</span>}
-              </span>
-              <Link href={`/runs/${run.id}`} className="text-blue-600 hover:underline">
-                View
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <h3 className="mb-2 text-sm font-semibold text-slate-700">Runs</h3>
+        {runs.length === 0 ? (
+          <EmptyState icon={IconClock} title="No runs yet" description="Start a run above to kick off the pipeline." />
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {runs.map((run) => (
+              <li key={run.id}>
+                <Card>
+                  <CardBody className="flex items-center justify-between gap-4 py-3">
+                    <span className="flex items-center gap-2 text-sm text-slate-700">
+                      <StatusBadge status={run.status} />
+                      stage: {run.stage}
+                      {run.error && <span className="text-red-600">({run.error})</span>}
+                    </span>
+                    <Link href={`/runs/${run.id}`} className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                      View →
+                    </Link>
+                  </CardBody>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const color =
-    status === "done"
-      ? "text-green-700"
-      : status === "failed"
-        ? "text-red-700"
-        : "text-amber-700";
-  return <span className={`font-medium ${color}`}>{status}</span>;
 }

@@ -2,6 +2,12 @@
 
 import { useState } from "react";
 import type { Strategy } from "@/lib/schemas/strategy";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card, CardBody, Section } from "@/components/ui/Card";
+import { Textarea } from "@/components/ui/Field";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { IconRefresh, IconSparkles } from "@/components/icons";
 
 interface StrategyPanelProps {
   runId: string;
@@ -37,84 +43,74 @@ export function StrategyPanel({ runId, initialStrategy }: StrategyPanelProps) {
   }
 
   return (
-    <section className="mt-6">
-      <h2 className="text-lg font-semibold">Strategy</h2>
-
+    <Section title="Strategy">
       {strategy ? (
-        <div className="mt-2 flex flex-col gap-3 rounded border border-gray-200 p-4 text-sm">
-          <div>
-            <p className="font-medium">{strategy.output.objective}</p>
-            <p className="text-gray-600">Audience: {strategy.output.audience}</p>
-          </div>
+        <Card>
+          <CardBody className="flex flex-col gap-4 text-sm">
+            <div>
+              <p className="font-medium text-slate-900">{strategy.output.objective}</p>
+              <p className="text-slate-500">Audience: {strategy.output.audience}</p>
+            </div>
 
-          <div className="flex flex-wrap gap-2">
-            {strategy.output.channels.map((channel) => (
-              <span
-                key={channel}
-                className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
-              >
-                {channel}
-              </span>
-            ))}
-            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
-              ₹{strategy.output.daily_budget}/day
-            </span>
-          </div>
-
-          <p>
-            <span className="font-medium">Offer:</span> {strategy.output.offer}
-          </p>
-
-          <div>
-            <p className="font-medium">Messaging pillars</p>
-            <ul className="list-inside list-disc text-gray-700">
-              {strategy.output.messaging_pillars.map((pillar) => (
-                <li key={pillar}>{pillar}</li>
+            <div className="flex flex-wrap gap-2">
+              {strategy.output.channels.map((channel) => (
+                <Badge key={channel} tone="indigo">
+                  {channel}
+                </Badge>
               ))}
-            </ul>
-          </div>
+              <Badge tone="neutral">₹{strategy.output.daily_budget}/day</Badge>
+            </div>
 
-          <div>
-            <p className="font-medium">KPIs</p>
-            <ul className="list-inside list-disc text-gray-700">
-              {strategy.output.kpis.map((kpi) => (
-                <li key={kpi.name}>
-                  {kpi.name}: {kpi.target}
-                </li>
-              ))}
-            </ul>
-          </div>
+            <p>
+              <span className="font-medium text-slate-900">Offer:</span>{" "}
+              <span className="text-slate-700">{strategy.output.offer}</span>
+            </p>
 
-          <div>
-            <p className="font-medium">Rationale</p>
-            <p className="text-gray-700">{strategy.output.rationale}</p>
-          </div>
+            <div>
+              <p className="font-medium text-slate-900">Messaging pillars</p>
+              <ul className="mt-1 list-inside list-disc text-slate-600">
+                {strategy.output.messaging_pillars.map((pillar) => (
+                  <li key={pillar}>{pillar}</li>
+                ))}
+              </ul>
+            </div>
 
-          <p className="text-xs text-gray-400">
-            Generated {strategy.createdAt.toLocaleString()}
-          </p>
-        </div>
+            <div>
+              <p className="font-medium text-slate-900">KPIs</p>
+              <ul className="mt-1 list-inside list-disc text-slate-600">
+                {strategy.output.kpis.map((kpi) => (
+                  <li key={kpi.name}>
+                    {kpi.name}: {kpi.target}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-medium text-slate-900">Rationale</p>
+              <p className="text-slate-600">{strategy.output.rationale}</p>
+            </div>
+
+            <p className="text-xs text-slate-400">Generated {strategy.createdAt.toLocaleString()}</p>
+          </CardBody>
+        </Card>
       ) : (
-        <p className="mt-2 text-sm text-gray-500">No strategy yet.</p>
+        <EmptyState icon={IconSparkles} title="No strategy yet" />
       )}
 
-      <div className="mt-4 flex flex-col gap-2">
-        <textarea
+      <div className="flex flex-col gap-2">
+        <Textarea
           value={note}
           onChange={(event) => setNote(event.target.value)}
           placeholder="Optional note for regeneration (e.g. focus more on lunch crowd)"
           rows={2}
-          className="rounded border border-gray-300 px-3 py-2 text-sm"
         />
-        <button
-          onClick={handleRegenerate}
-          disabled={pending}
-          className="self-start rounded bg-black px-3 py-1 text-sm text-white disabled:opacity-50"
-        >
+        <Button variant="secondary" size="sm" onClick={handleRegenerate} disabled={pending} className="self-start">
+          <IconRefresh className="h-3.5 w-3.5" />
           {pending ? "Regenerating…" : "Regenerate strategy"}
-        </button>
+        </Button>
         {error && <p className="text-sm text-red-600">{error}</p>}
       </div>
-    </section>
+    </Section>
   );
 }
