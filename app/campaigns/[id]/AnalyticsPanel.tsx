@@ -5,7 +5,7 @@ import type { Observations } from "@/lib/schemas/observations";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody, Section } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { IconRefresh, IconSparkles } from "@/components/icons";
+import { IconRefresh } from "@/components/icons";
 
 interface ObservationsWithMeta {
   output: Observations;
@@ -52,28 +52,28 @@ export function AnalyticsPanel({ campaignId, initialObservations }: AnalyticsPan
         </Button>
       }
     >
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-stop">{error}</p>}
 
       {!observations ? (
-        <EmptyState icon={IconSparkles} title="No observations yet" />
+        <EmptyState title="No observations yet" />
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Card>
             <CardBody className="text-sm">
-              <p className="text-xs font-medium uppercase text-slate-500">Interpretation</p>
-              <p className="mt-1 text-slate-700">{observations.output.interpretation}</p>
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="text-xs font-medium uppercase text-muted">Interpretation</p>
+              <p className="mt-1 text-ink">{observations.output.interpretation}</p>
+              <p className="mt-2 text-xs text-muted">
                 Window {observations.output.window.start} → {observations.output.window.end}
               </p>
             </CardBody>
           </Card>
           <Card>
             <CardBody className="text-sm">
-              <p className="text-xs font-medium uppercase text-slate-500">Anomalies</p>
+              <p className="text-xs font-medium uppercase text-muted">Anomalies</p>
               {observations.output.anomalies.length === 0 ? (
-                <p className="mt-1 text-slate-500">None flagged.</p>
+                <p className="mt-1 text-muted">None flagged.</p>
               ) : (
-                <ul className="mt-1 list-inside list-disc text-slate-700">
+                <ul className="mt-1 list-inside list-disc text-ink">
                   {observations.output.anomalies.map((anomaly, index) => (
                     <li key={index}>{anomaly}</li>
                   ))}

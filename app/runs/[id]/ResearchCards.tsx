@@ -16,17 +16,17 @@ function EvidenceExpander({
 
   return (
     <details className="mt-1.5">
-      <summary className="cursor-pointer text-xs font-medium text-indigo-600 hover:text-indigo-700">
+      <summary className="cursor-pointer text-xs font-medium text-signal hover:underline">
         Evidence ({sourceIds.length})
       </summary>
-      <ul className="mt-1.5 flex flex-col gap-1 border-l-2 border-slate-100 pl-3">
+      <ul className="mt-1.5 flex flex-col gap-1 border-l-2 border-line pl-3">
         {cited.map((item) => (
-          <li key={item.id} className="text-xs text-slate-500">
-            <span className="font-medium text-slate-600">[{item.id}]</span> ({item.source}){" "}
+          <li key={item.id} className="text-xs text-muted">
+            <span className="font-medium text-muted">[{item.id}]</span> ({item.source}){" "}
             {item.snippet}
           </li>
         ))}
-        {cited.length === 0 && <li className="text-xs text-slate-400">No matching evidence found.</li>}
+        {cited.length === 0 && <li className="text-xs text-muted">No matching evidence found.</li>}
       </ul>
     </details>
   );
@@ -36,7 +36,7 @@ function ResearchCard({ title, children }: { title: string; children: React.Reac
   return (
     <Card>
       <CardBody>
-        <h3 className="text-sm font-semibold text-slate-800">{title}</h3>
+        <h3 className="text-sm font-semibold text-ink">{title}</h3>
         <div className="mt-2.5">{children}</div>
       </CardBody>
     </Card>
@@ -51,8 +51,8 @@ export function ResearchCards({ output }: { output: ResearchOutput }) {
           <ul className="flex flex-col gap-3">
             {output.target_segments.map((segment) => (
               <li key={segment.name} className="text-sm">
-                <p className="font-medium text-slate-900">{segment.name}</p>
-                <p className="text-slate-600">{segment.description}</p>
+                <p className="font-medium text-ink">{segment.name}</p>
+                <p className="text-muted">{segment.description}</p>
                 <EvidenceExpander sourceIds={segment.source_ids} evidence={output.evidence} />
               </li>
             ))}
@@ -63,7 +63,7 @@ export function ResearchCards({ output }: { output: ResearchOutput }) {
           <ul className="flex flex-wrap gap-2">
             {output.recommended_channels.map((channel) => (
               <li key={channel}>
-                <Badge tone="indigo">{channel}</Badge>
+                <Badge tone="info">{channel}</Badge>
               </li>
             ))}
           </ul>
@@ -73,7 +73,7 @@ export function ResearchCards({ output }: { output: ResearchOutput }) {
           <ul className="flex flex-col gap-3">
             {output.opportunities.map((opportunity, index) => (
               <li key={index} className="text-sm">
-                <p className="text-slate-600">{opportunity.description}</p>
+                <p className="text-muted">{opportunity.description}</p>
                 <EvidenceExpander sourceIds={opportunity.source_ids} evidence={output.evidence} />
               </li>
             ))}
@@ -84,7 +84,7 @@ export function ResearchCards({ output }: { output: ResearchOutput }) {
           <ul className="flex flex-col gap-3">
             {output.pain_points.map((painPoint, index) => (
               <li key={index} className="text-sm">
-                <p className="text-slate-600">{painPoint.description}</p>
+                <p className="text-muted">{painPoint.description}</p>
                 <EvidenceExpander sourceIds={painPoint.source_ids} evidence={output.evidence} />
               </li>
             ))}
@@ -93,7 +93,7 @@ export function ResearchCards({ output }: { output: ResearchOutput }) {
       </div>
 
       <div>
-        <h3 className="mb-2.5 text-sm font-semibold text-slate-800">Competitors</h3>
+        <h3 className="mb-2.5 text-sm font-semibold text-ink">Competitors</h3>
         <Table>
           <THead>
             <TH>Name</TH>
@@ -103,7 +103,7 @@ export function ResearchCards({ output }: { output: ResearchOutput }) {
           <TBody>
             {output.competitors.map((competitor) => (
               <TR key={competitor.name}>
-                <TD className="font-medium text-slate-900">{competitor.name}</TD>
+                <TD className="font-medium text-ink">{competitor.name}</TD>
                 <TD>{competitor.notes}</TD>
                 <TD>
                   <EvidenceExpander sourceIds={competitor.source_ids} evidence={output.evidence} />

@@ -6,10 +6,7 @@ export function Card({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      className={cn("rounded-xl border border-slate-200 bg-white shadow-sm", className)}
-      {...props}
-    >
+    <div className={cn("rounded-md border border-line bg-surface", className)} {...props}>
       {children}
     </div>
   );
@@ -35,8 +32,8 @@ export function SectionHeader({
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
-        <h2 className="text-base font-semibold text-slate-900">{title}</h2>
-        {description && <p className="mt-0.5 text-sm text-slate-500">{description}</p>}
+        <h2 className="text-sm font-semibold text-ink">{title}</h2>
+        {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
       </div>
       {action}
     </div>

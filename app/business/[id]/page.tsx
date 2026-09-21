@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import { getBusinessWithGoals } from "@/lib/db/queries/businesses";
 import { getRunsForBusiness } from "@/lib/db/queries/runs";
+import { getBusinessConsoleStats } from "@/lib/db/queries/dashboard";
+import { getRecentPolicyDecisions } from "@/lib/db/queries/policy";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card, CardBody, Section } from "@/components/ui/Card";
-import { IconBuilding } from "@/components/icons";
+import { MetricsStrip } from "@/components/ui/MetricsStrip";
+import { Section } from "@/components/ui/Card";
 import { RunsPanel } from "./RunsPanel";
 
 export default async function BusinessPage({
@@ -17,38 +19,55 @@ export default async function BusinessPage({
     notFound();
   }
   const { business, goals } = result;
-  const runs = await getRunsForBusiness(id);
+  const [runs, stats, lastDecisions] = await Promise.all([
+    getRunsForBusiness(id),
+    getBusinessConsoleStats(id),
+    getRecentPolicyDecisions(1),
+  ]);
+
+  const lastDecision = lastDecisions[0];
+  const budgetPct = business.monthlyBudget > 0 ? Math.round((stats.spendLast30d / business.monthlyBudget) * 100) : 0;
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-10">
+    <main className="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-10">
       <PageHeader
-        eyebrow={business.industry}
+        eyebrow={`${business.industry} · ${business.location}`}
         title={business.name}
-        description={business.location}
+        description={business.brandNotes ?? undefined}
       />
 
-      <Card>
-        <CardBody>
-          <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
-            <IconBuilding className="h-4 w-4" />
-            Business details
-          </div>
-          <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
-            <dt className="text-slate-500">Industry</dt>
-            <dd className="text-slate-900">{business.industry}</dd>
-            <dt className="text-slate-500">Location</dt>
-            <dd className="text-slate-900">{business.location}</dd>
-            <dt className="text-slate-500">Monthly budget</dt>
-            <dd className="text-slate-900">₹{business.monthlyBudget.toLocaleString("en-IN")}</dd>
-            {business.brandNotes && (
-              <>
-                <dt className="text-slate-500">Brand notes</dt>
-                <dd className="text-slate-900">{business.brandNotes}</dd>
-              </>
-            )}
-          </dl>
-        </CardBody>
-      </Card>
+      <MetricsStrip
+        metrics={[
+          {
+            label: "Live campaigns",
+            value: String(stats.liveCampaigns.length),
+            tone: stats.liveCampaigns.length > 0 ? "money" : undefined,
+          },
+          {
+            label: "Spend (last 30d)",
+            value: `₹${stats.spendLast30d.toLocaleString("en-IN", { maximumFractionDigits: 0 })} / ₹${business.monthlyBudget.toLocaleString("en-IN")}`,
+            hint: `${budgetPct}% of monthly budget`,
+          },
+          {
+            label: "Approvals pending",
+            value: String(stats.pendingApprovalsCount),
+            tone: stats.pendingApprovalsCount > 0 ? "caution" : undefined,
+          },
+          {
+            label: "Last policy decision",
+            value: lastDecision ? lastDecision.decision.replace(/_/g, " ") : "—",
+            hint: lastDecision ? lastDecision.action : "no policy activity yet (site-wide)",
+            tone:
+              lastDecision?.decision === "allow"
+                ? "money"
+                : lastDecision?.decision === "block"
+                  ? "stop"
+                  : lastDecision?.decision === "require_approval"
+                    ? "caution"
+                    : undefined,
+          },
+        ]}
+      />
 
       <Section title="Goals">
         <RunsPanel goals={goals} initialRuns={runs} />

@@ -1,7 +1,18 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --color-ink: #14171c;
+  --color-muted: #83806f;
+  --color-paper: #f6f5f1;
+  --color-surface: #ffffff;
+  --color-line: #ddd9ce;
+  --color-signal: #1f4fff;
+  --color-money: #0e7a5c;
+  --color-caution: #b5650c;
+  --color-stop: #b23a2e;
 }
 
 html {
@@ -9,15 +20,20 @@ html {
 }
 
 body {
-  background-color: var(--color-slate-50);
-  color: var(--color-slate-900);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
 }
 
 ::selection {
-  background-color: var(--color-indigo-100);
-  color: var(--color-indigo-900);
+  background-color: color-mix(in oklab, var(--color-signal) 20%, white);
+  color: var(--color-ink);
 }
 
 * {
-  border-color: var(--color-slate-200);
+  border-color: var(--color-line);
+}
+
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }

@@ -6,13 +6,11 @@ type Variant = "primary" | "secondary" | "danger" | "success" | "ghost";
 type Size = "sm" | "md";
 
 const VARIANT: Record<Variant, string> = {
-  primary:
-    "bg-indigo-600 text-white shadow-sm hover:bg-indigo-500 disabled:bg-indigo-300",
-  secondary:
-    "bg-white text-slate-700 border border-slate-300 shadow-sm hover:bg-slate-50 disabled:text-slate-400",
-  danger: "bg-red-600 text-white shadow-sm hover:bg-red-500 disabled:bg-red-300",
-  success: "bg-emerald-600 text-white shadow-sm hover:bg-emerald-500 disabled:bg-emerald-300",
-  ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900 disabled:text-slate-300",
+  primary: "bg-signal text-white hover:bg-signal/90 disabled:bg-signal/40",
+  secondary: "bg-surface text-ink border border-line hover:bg-paper disabled:text-muted",
+  danger: "bg-stop text-white hover:bg-stop/90 disabled:bg-stop/40",
+  success: "bg-money text-white hover:bg-money/90 disabled:bg-money/40",
+  ghost: "text-muted hover:bg-ink/5 hover:text-ink disabled:text-muted/50",
 };
 
 const SIZE: Record<Size, string> = {
@@ -22,7 +20,7 @@ const SIZE: Record<Size, string> = {
 
 export function buttonClasses(variant: Variant = "primary", size: Size = "md", className?: string) {
   return cn(
-    "inline-flex items-center justify-center rounded-md font-medium transition-colors disabled:cursor-not-allowed",
+    "inline-flex items-center justify-center rounded-sm font-medium transition-colors disabled:cursor-not-allowed",
     VARIANT[variant],
     SIZE[size],
     className,

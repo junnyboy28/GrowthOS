@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardBody, Section } from "@/components/ui/Card";
 import { Textarea } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { IconRefresh, IconSparkles } from "@/components/icons";
+import { IconRefresh } from "@/components/icons";
 
 interface StrategyPanelProps {
   runId: string;
@@ -48,13 +48,13 @@ export function StrategyPanel({ runId, initialStrategy }: StrategyPanelProps) {
         <Card>
           <CardBody className="flex flex-col gap-4 text-sm">
             <div>
-              <p className="font-medium text-slate-900">{strategy.output.objective}</p>
-              <p className="text-slate-500">Audience: {strategy.output.audience}</p>
+              <p className="font-medium text-ink">{strategy.output.objective}</p>
+              <p className="text-muted">Audience: {strategy.output.audience}</p>
             </div>
 
             <div className="flex flex-wrap gap-2">
               {strategy.output.channels.map((channel) => (
-                <Badge key={channel} tone="indigo">
+                <Badge key={channel} tone="info">
                   {channel}
                 </Badge>
               ))}
@@ -62,13 +62,13 @@ export function StrategyPanel({ runId, initialStrategy }: StrategyPanelProps) {
             </div>
 
             <p>
-              <span className="font-medium text-slate-900">Offer:</span>{" "}
-              <span className="text-slate-700">{strategy.output.offer}</span>
+              <span className="font-medium text-ink">Offer:</span>{" "}
+              <span className="text-ink">{strategy.output.offer}</span>
             </p>
 
             <div>
-              <p className="font-medium text-slate-900">Messaging pillars</p>
-              <ul className="mt-1 list-inside list-disc text-slate-600">
+              <p className="font-medium text-ink">Messaging pillars</p>
+              <ul className="mt-1 list-inside list-disc text-muted">
                 {strategy.output.messaging_pillars.map((pillar) => (
                   <li key={pillar}>{pillar}</li>
                 ))}
@@ -76,8 +76,8 @@ export function StrategyPanel({ runId, initialStrategy }: StrategyPanelProps) {
             </div>
 
             <div>
-              <p className="font-medium text-slate-900">KPIs</p>
-              <ul className="mt-1 list-inside list-disc text-slate-600">
+              <p className="font-medium text-ink">KPIs</p>
+              <ul className="mt-1 list-inside list-disc text-muted">
                 {strategy.output.kpis.map((kpi) => (
                   <li key={kpi.name}>
                     {kpi.name}: {kpi.target}
@@ -87,15 +87,15 @@ export function StrategyPanel({ runId, initialStrategy }: StrategyPanelProps) {
             </div>
 
             <div>
-              <p className="font-medium text-slate-900">Rationale</p>
-              <p className="text-slate-600">{strategy.output.rationale}</p>
+              <p className="font-medium text-ink">Rationale</p>
+              <p className="text-muted">{strategy.output.rationale}</p>
             </div>
 
-            <p className="text-xs text-slate-400">Generated {strategy.createdAt.toLocaleString()}</p>
+            <p className="text-xs text-muted">Generated {strategy.createdAt.toLocaleString()}</p>
           </CardBody>
         </Card>
       ) : (
-        <EmptyState icon={IconSparkles} title="No strategy yet" />
+        <EmptyState title="No strategy yet" />
       )}
 
       <div className="flex flex-col gap-2">
@@ -109,7 +109,7 @@ export function StrategyPanel({ runId, initialStrategy }: StrategyPanelProps) {
           <IconRefresh className="h-3.5 w-3.5" />
           {pending ? "Regenerating…" : "Regenerate strategy"}
         </Button>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-stop">{error}</p>}
       </div>
     </Section>
   );

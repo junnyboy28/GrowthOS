@@ -4,7 +4,6 @@ import { evaluate } from "@/lib/policy/evaluate";
 import type { Recommendation } from "@/lib/schemas/recommendation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { IconInbox } from "@/components/icons";
 import { ApprovalCard, type ApprovalItem } from "./ApprovalCard";
 
 export default async function ApprovalsPage() {
@@ -36,7 +35,7 @@ export default async function ApprovalsPage() {
       />
 
       {items.length === 0 ? (
-        <EmptyState icon={IconInbox} title="Nothing pending" description="Everything caught up." />
+        <EmptyState title="Nothing pending" description="Everything caught up." />
       ) : (
         <div className="flex flex-col gap-4">
           {items.map((item) => (

@@ -8,7 +8,7 @@ import { StatusBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody, Section } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { IconExternalLink, IconPlay, IconTrendingUp } from "@/components/icons";
+import { IconExternalLink, IconPlay } from "@/components/icons";
 
 interface CampaignPanelProps {
   initialCampaign: CampaignRow | null;
@@ -67,7 +67,7 @@ export function CampaignPanel({ initialCampaign }: CampaignPanelProps) {
   if (!campaign) {
     return (
       <Section title="Campaign">
-        <EmptyState icon={IconTrendingUp} title="No campaign yet" />
+        <EmptyState title="No campaign yet" />
       </Section>
     );
   }
@@ -78,21 +78,21 @@ export function CampaignPanel({ initialCampaign }: CampaignPanelProps) {
     <Section title="Campaign">
       <Card>
         <CardBody className="flex flex-col gap-2 text-sm">
-          <p className="font-medium text-slate-900">{spec.objective}</p>
-          <p className="text-slate-600">Audience: {spec.audience}</p>
-          <p className="text-slate-600">
+          <p className="font-medium text-ink">{spec.objective}</p>
+          <p className="text-muted">Audience: {spec.audience}</p>
+          <p className="text-muted">
             ₹{spec.daily_budget}/day · {spec.cta} · {spec.creative_ids.length} creative(s)
           </p>
-          <p className="text-slate-600">
+          <p className="text-muted">
             {spec.schedule.start_date} → {spec.schedule.end_date ?? "ongoing"}
           </p>
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="flex items-center gap-2 text-xs text-muted">
             <StatusBadge status={campaign.status} />
             {campaign.externalId && <span>External id: {campaign.externalId}</span>}
           </div>
           <Link
             href={`/campaigns/${campaign.id}`}
-            className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+            className="inline-flex items-center gap-1 text-xs font-medium text-signal hover:underline"
           >
             View dashboard
             <IconExternalLink className="h-3 w-3" />
@@ -108,12 +108,12 @@ export function CampaignPanel({ initialCampaign }: CampaignPanelProps) {
               )}
 
               {outcome && (
-                <Card className="border-slate-100 shadow-none">
+                <Card className="bg-paper">
                   <CardBody className="p-3">
-                    <p className="text-xs font-medium uppercase text-slate-500">
+                    <p className="text-xs font-medium uppercase text-muted">
                       Policy decision: {outcome.status}
                     </p>
-                    {outcome.reason && <p className="mt-1 text-slate-700">{outcome.reason}</p>}
+                    {outcome.reason && <p className="mt-1 text-ink">{outcome.reason}</p>}
                     {outcome.status === "require_approval" && (
                       <Button
                         variant="success"
@@ -129,7 +129,7 @@ export function CampaignPanel({ initialCampaign }: CampaignPanelProps) {
                 </Card>
               )}
 
-              {error && <p className="text-sm text-red-600">{error}</p>}
+              {error && <p className="text-sm text-stop">{error}</p>}
             </div>
           )}
         </CardBody>

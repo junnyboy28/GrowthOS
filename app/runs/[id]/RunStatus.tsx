@@ -42,11 +42,11 @@ function getStageState(name: string, run: Run, stageNames: readonly string[]): S
 }
 
 const STAGE_STYLE: Record<StageState, { icon: typeof IconCheck; color: string }> = {
-  done: { icon: IconCheck, color: "text-emerald-600" },
-  running: { icon: IconRefresh, color: "text-indigo-600" },
-  failed: { icon: IconX, color: "text-red-600" },
-  pending: { icon: IconClock, color: "text-slate-300" },
-  awaiting_approval: { icon: IconPause, color: "text-amber-600" },
+  done: { icon: IconCheck, color: "text-money" },
+  running: { icon: IconRefresh, color: "text-signal" },
+  failed: { icon: IconX, color: "text-stop" },
+  pending: { icon: IconClock, color: "text-muted" },
+  awaiting_approval: { icon: IconPause, color: "text-caution" },
 };
 
 export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: RunStatusProps) {
@@ -91,7 +91,7 @@ export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: Ru
         <Card>
           <CardBody className="flex flex-col gap-4">
             {stageNames.length === 0 ? (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-muted">
                 No stages registered yet — this run goes straight to done.
               </p>
             ) : (
@@ -104,22 +104,22 @@ export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: Ru
                     <li key={name} className="flex items-center gap-2">
                       <span className={`flex items-center gap-1.5 text-sm ${style.color}`}>
                         <Icon className="h-4 w-4" />
-                        <span className="text-slate-700">{name}</span>
+                        <span className="text-ink">{name}</span>
                       </span>
                       {index < stageNames.length - 1 && (
-                        <span className="h-px w-6 bg-slate-200" />
+                        <span className="h-px w-6 bg-line" />
                       )}
                     </li>
                   );
                 })}
               </ol>
             )}
-            <div className="flex flex-wrap items-center gap-3 border-t border-slate-100 pt-4">
+            <div className="flex flex-wrap items-center gap-3 border-t border-line pt-4">
               <StatusBadge status={run.status} />
               {run.status === "failed" && run.error && (
-                <span className="text-sm text-red-600">{run.error}</span>
+                <span className="text-sm text-stop">{run.error}</span>
               )}
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-muted">
                 Started {new Date(run.startedAt).toLocaleString()}
                 {run.finishedAt && ` · Finished ${new Date(run.finishedAt).toLocaleString()}`}
               </span>
@@ -130,7 +130,7 @@ export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: Ru
                   <IconRefresh className="h-3.5 w-3.5" />
                   {retrying ? "Retrying…" : `Retry ${run.stage}`}
                 </Button>
-                {retryError && <p className="mt-1 text-sm text-red-600">{retryError}</p>}
+                {retryError && <p className="mt-1 text-sm text-stop">{retryError}</p>}
               </div>
             )}
           </CardBody>
@@ -142,7 +142,7 @@ export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: Ru
         description={llmCalls.length > 0 ? `₹${totalCost.toFixed(4)} total` : undefined}
       >
         {llmCalls.length === 0 ? (
-          <EmptyState icon={IconClock} title="No LLM calls yet" />
+          <EmptyState title="No LLM calls yet" />
         ) : (
           <Table>
             <THead>
@@ -157,11 +157,11 @@ export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: Ru
                 <TR key={call.id}>
                   <TD>{call.stage}</TD>
                   <TD>{call.model}</TD>
-                  <TD>
+                  <TD className="tabular">
                     {call.inputTokens} in / {call.outputTokens} out
                   </TD>
-                  <TD>{call.latencyMs}ms</TD>
-                  <TD>{Number(call.costInr).toFixed(4)}</TD>
+                  <TD className="tabular">{call.latencyMs}ms</TD>
+                  <TD className="tabular">{Number(call.costInr).toFixed(4)}</TD>
                 </TR>
               ))}
             </TBody>

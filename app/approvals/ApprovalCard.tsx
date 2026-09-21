@@ -41,7 +41,7 @@ export function ApprovalCard({ item }: { item: ApprovalItem }) {
   if (status !== "pending") {
     return (
       <Card>
-        <CardBody className="flex items-center justify-between text-sm text-slate-500">
+        <CardBody className="flex items-center justify-between text-sm text-muted">
           <span>
             {item.output.action} for {item.businessName}
           </span>
@@ -55,26 +55,26 @@ export function ApprovalCard({ item }: { item: ApprovalItem }) {
     <Card>
       <CardBody className="flex flex-col gap-2 text-sm">
         <div className="flex items-center justify-between">
-          <p className="font-medium text-slate-900">{item.output.action}</p>
-          <Link href={`/campaigns/${item.campaignId}`} className="text-xs font-medium text-indigo-600 hover:text-indigo-700">
+          <p className="font-medium text-ink">{item.output.action}</p>
+          <Link href={`/campaigns/${item.campaignId}`} className="text-xs font-medium text-signal hover:underline">
             {item.businessName}
           </Link>
         </div>
-        <p className="text-slate-600">
-          <span className="font-medium text-slate-900">Expected impact:</span> {item.output.expected_impact}
+        <p className="text-muted">
+          <span className="font-medium text-ink">Expected impact:</span> {item.output.expected_impact}
         </p>
-        <p className="text-slate-600">
-          <span className="font-medium text-slate-900">Confidence:</span>{" "}
+        <p className="text-muted">
+          <span className="font-medium text-ink">Confidence:</span>{" "}
           {(item.output.confidence * 100).toFixed(0)}%
         </p>
-        <p className="text-slate-600">
-          <span className="font-medium text-slate-900">Rationale:</span> {item.output.rationale}
+        <p className="text-muted">
+          <span className="font-medium text-ink">Rationale:</span> {item.output.rationale}
         </p>
-        <p className="flex items-center gap-1.5 text-xs text-amber-700">
+        <p className="flex items-center gap-1.5 text-xs text-caution">
           <IconAlertTriangle className="h-3.5 w-3.5 shrink-0" />
           <span className="font-medium">Policy:</span> {item.policyReason}
         </p>
-        <pre className="overflow-x-auto rounded-md bg-slate-50 p-2.5 text-xs text-slate-600">
+        <pre className="overflow-x-auto rounded-md bg-paper p-2.5 text-xs text-muted">
           {JSON.stringify(item.output.params, null, 2)}
         </pre>
 
@@ -88,7 +88,7 @@ export function ApprovalCard({ item }: { item: ApprovalItem }) {
             Reject
           </Button>
         </div>
-        {error && <p className="text-xs text-red-600">{error}</p>}
+        {error && <p className="text-xs text-stop">{error}</p>}
       </CardBody>
     </Card>
   );

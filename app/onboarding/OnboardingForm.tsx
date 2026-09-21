@@ -83,7 +83,7 @@ export function OnboardingForm() {
         <Textarea ref={brandNotesRef} name="brandNotes" rows={3} />
       </Field>
 
-      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state.error && <p className="text-sm text-stop">{state.error}</p>}
 
       <Button type="submit" disabled={pending} className="self-start">
         {pending ? "Creating…" : "Create business"}

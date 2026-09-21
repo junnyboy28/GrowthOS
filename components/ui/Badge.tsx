@@ -1,14 +1,13 @@
 import { cn } from "./cn";
 
-export type Tone = "neutral" | "success" | "warning" | "danger" | "info" | "indigo";
+export type Tone = "neutral" | "success" | "warning" | "danger" | "info";
 
 const TONE: Record<Tone, string> = {
-  neutral: "bg-slate-100 text-slate-700",
-  success: "bg-emerald-50 text-emerald-700",
-  warning: "bg-amber-50 text-amber-700",
-  danger: "bg-red-50 text-red-700",
-  info: "bg-sky-50 text-sky-700",
-  indigo: "bg-indigo-50 text-indigo-700",
+  neutral: "bg-ink/5 text-muted",
+  success: "bg-money/10 text-money",
+  warning: "bg-caution/10 text-caution",
+  danger: "bg-stop/10 text-stop",
+  info: "bg-signal/10 text-signal",
 };
 
 export function Badge({
@@ -23,7 +22,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-xs font-medium",
         TONE[tone],
         className,
       )}
@@ -46,7 +45,8 @@ const STATUS_TONE: Record<string, Tone> = {
   require_approval: "warning",
   pending: "neutral",
   pending_launch: "neutral",
-  running: "indigo",
+  idle: "neutral",
+  running: "info",
 };
 
 export function StatusBadge({ status }: { status: string }) {

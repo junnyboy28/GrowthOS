@@ -1,11 +1,10 @@
 import { getSystemStats } from "@/lib/db/queries/system";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
+import { MetricsStrip } from "@/components/ui/MetricsStrip";
 import { Section } from "@/components/ui/Card";
 import { Badge, type Tone } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
-import { IconActivity, IconShield } from "@/components/icons";
 
 const DECISION_TONE: Record<string, Tone> = {
   allow: "success",
@@ -24,14 +23,16 @@ export default async function SystemPage() {
         description="Aggregate cost and policy activity so far."
       />
 
-      <div className="grid grid-cols-2 gap-4">
-        <StatCard label="Total LLM cost" value={`₹${stats.totalCostInr.toFixed(4)}`} />
-        <StatCard label="Total LLM calls" value={stats.totalCalls.toString()} />
-      </div>
+      <MetricsStrip
+        metrics={[
+          { label: "Total LLM cost", value: `₹${stats.totalCostInr.toFixed(4)}` },
+          { label: "Total LLM calls", value: stats.totalCalls.toString() },
+        ]}
+      />
 
       <Section title="Calls per stage">
         {stats.callsByStage.length === 0 ? (
-          <EmptyState icon={IconActivity} title="No LLM calls yet" />
+          <EmptyState title="No LLM calls yet" />
         ) : (
           <Table>
             <THead>
@@ -43,8 +44,8 @@ export default async function SystemPage() {
               {stats.callsByStage.map((row) => (
                 <TR key={row.stage}>
                   <TD>{row.stage}</TD>
-                  <TD>{row.calls}</TD>
-                  <TD>₹{row.costInr.toFixed(4)}</TD>
+                  <TD className="tabular">{row.calls}</TD>
+                  <TD className="tabular">₹{row.costInr.toFixed(4)}</TD>
                 </TR>
               ))}
             </TBody>
@@ -54,13 +55,13 @@ export default async function SystemPage() {
 
       <Section title="Policy decisions">
         {stats.decisionCounts.length === 0 ? (
-          <EmptyState icon={IconShield} title="No policy decisions yet" />
+          <EmptyState title="No policy decisions yet" />
         ) : (
           <ul className="flex flex-col gap-2">
             {stats.decisionCounts.map((row) => (
-              <li key={row.decision} className="flex items-center gap-2 text-sm text-slate-700">
+              <li key={row.decision} className="flex items-center gap-2 text-sm text-ink">
                 <Badge tone={DECISION_TONE[row.decision] ?? "neutral"}>{row.decision}</Badge>
-                {row.count}
+                <span className="tabular">{row.count}</span>
               </li>
             ))}
           </ul>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardBody, Section } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { cn } from "@/components/ui/cn";
-import { IconCheck, IconRefresh, IconSparkles, IconX } from "@/components/icons";
+import { IconCheck, IconRefresh, IconX } from "@/components/icons";
 
 interface CreativesPanelProps {
   runId: string;
@@ -16,9 +16,9 @@ interface CreativesPanelProps {
 }
 
 const STATUS_BORDER: Record<string, string> = {
-  pending: "border-slate-200",
-  approved: "border-emerald-300",
-  rejected: "border-red-200 opacity-60",
+  pending: "border-line",
+  approved: "border-money/40",
+  rejected: "border-stop/30 opacity-60",
 };
 
 const STATUS_TONE: Record<string, Tone> = {
@@ -85,7 +85,7 @@ export function CreativesPanel({ runId, initialCreatives }: CreativesPanelProps)
   if (creatives.length === 0) {
     return (
       <Section title="Creatives">
-        <EmptyState icon={IconSparkles} title="No creatives yet" />
+        <EmptyState title="No creatives yet" />
       </Section>
     );
   }
@@ -99,7 +99,7 @@ export function CreativesPanel({ runId, initialCreatives }: CreativesPanelProps)
           return (
             <Card
               key={creativeRow.id}
-              className={cn(STATUS_BORDER[creativeRow.status] ?? "border-slate-200")}
+              className={cn(STATUS_BORDER[creativeRow.status] ?? "border-line")}
             >
               <CardBody className="flex flex-col gap-2 text-sm">
                 <div className="flex items-center justify-between">
@@ -108,11 +108,11 @@ export function CreativesPanel({ runId, initialCreatives }: CreativesPanelProps)
                     {creativeRow.status}
                   </Badge>
                 </div>
-                <p className="font-medium text-slate-900">{creative.headline}</p>
-                <p className="italic text-slate-600">{creative.hook}</p>
-                <p className="text-slate-600">{creative.caption}</p>
-                <p className="text-xs text-slate-500">CTA: {creative.cta}</p>
-                <p className="text-xs text-slate-400">Image prompt: {creative.image_prompt}</p>
+                <p className="font-medium text-ink">{creative.headline}</p>
+                <p className="italic text-muted">{creative.hook}</p>
+                <p className="text-muted">{creative.caption}</p>
+                <p className="text-xs text-muted">CTA: {creative.cta}</p>
+                <p className="text-xs text-muted">Image prompt: {creative.image_prompt}</p>
 
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Button
@@ -154,9 +154,9 @@ export function CreativesPanel({ runId, initialCreatives }: CreativesPanelProps)
           {continued ? "Continuing…" : continuePending ? "Continuing…" : "Continue"}
         </Button>
         {!hasApproved && !continued && (
-          <span className="text-xs text-slate-500">Approve at least one creative to continue.</span>
+          <span className="text-xs text-muted">Approve at least one creative to continue.</span>
         )}
-        {continueError && <span className="text-sm text-red-600">{continueError}</span>}
+        {continueError && <span className="text-sm text-stop">{continueError}</span>}
       </div>
     </Section>
   );

@@ -4,7 +4,6 @@ import { Section } from "@/components/ui/Card";
 import { Badge, type Tone } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
-import { IconActivity, IconShield } from "@/components/icons";
 
 const DECISION_TONE: Record<string, Tone> = {
   allow: "success",
@@ -28,7 +27,7 @@ export default async function PolicyPage() {
 
       <Section title="Policy decisions">
         {decisions.length === 0 ? (
-          <EmptyState icon={IconShield} title="No policy decisions yet" />
+          <EmptyState title="No policy decisions yet" />
         ) : (
           <Table>
             <THead>
@@ -41,12 +40,12 @@ export default async function PolicyPage() {
             <TBody>
               {decisions.map((decision) => (
                 <TR key={decision.id}>
-                  <TD className="text-xs text-slate-400">{decision.createdAt.toLocaleString()}</TD>
+                  <TD className="text-xs text-muted">{decision.createdAt.toLocaleString()}</TD>
                   <TD>{decision.action}</TD>
                   <TD>
                     <Badge tone={DECISION_TONE[decision.decision] ?? "neutral"}>{decision.decision}</Badge>
                   </TD>
-                  <TD className="text-xs text-slate-400">{decision.ruleId}</TD>
+                  <TD className="text-xs text-muted">{decision.ruleId}</TD>
                   <TD>{decision.reason}</TD>
                 </TR>
               ))}
@@ -57,7 +56,7 @@ export default async function PolicyPage() {
 
       <Section title="Executed actions">
         {actions.length === 0 ? (
-          <EmptyState icon={IconActivity} title="No actions executed yet" />
+          <EmptyState title="No actions executed yet" />
         ) : (
           <Table>
             <THead>
@@ -70,13 +69,13 @@ export default async function PolicyPage() {
             <TBody>
               {actions.map((action) => (
                 <TR key={action.id}>
-                  <TD className="text-xs text-slate-400">{action.createdAt.toLocaleString()}</TD>
+                  <TD className="text-xs text-muted">{action.createdAt.toLocaleString()}</TD>
                   <TD>{action.adapter}</TD>
                   <TD>{action.method}</TD>
-                  <TD className="text-xs text-slate-400">
+                  <TD className="text-xs text-muted">
                     {action.before ? JSON.stringify(action.before) : "—"}
                   </TD>
-                  <TD className="text-xs text-slate-400">
+                  <TD className="text-xs text-muted">
                     {action.after ? JSON.stringify(action.after) : "—"}
                   </TD>
                 </TR>

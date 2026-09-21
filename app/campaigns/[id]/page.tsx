@@ -10,12 +10,11 @@ import {
 import { getLatestObservationsForCampaign } from "@/lib/db/queries/observations";
 import type { CampaignSpec } from "@/lib/schemas/campaignSpec";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
+import { MetricsStrip } from "@/components/ui/MetricsStrip";
 import { Section } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
-import { IconTrendingUp } from "@/components/icons";
 import { ActionsTimeline } from "./ActionsTimeline";
 import { AnalyticsPanel } from "./AnalyticsPanel";
 import { ConversionsChart } from "./ConversionsChart";
@@ -52,13 +51,15 @@ export default async function CampaignDashboardPage({
         actions={<StatusBadge status={campaign.status} />}
       />
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
-        <StatCard label="Spend" value={`₹${totals.spend.toFixed(0)}`} />
-        <StatCard label="Clicks" value={totals.clicks.toString()} />
-        <StatCard label="Conversions" value={totals.conversions.toString()} />
-        <StatCard label="CPA" value={`₹${totals.cpa.toFixed(2)}`} />
-        <StatCard label="CTR" value={`${(totals.ctr * 100).toFixed(2)}%`} />
-      </div>
+      <MetricsStrip
+        metrics={[
+          { label: "Spend", value: `₹${totals.spend.toFixed(0)}` },
+          { label: "Clicks", value: totals.clicks.toString() },
+          { label: "Conversions", value: totals.conversions.toString() },
+          { label: "CPA", value: `₹${totals.cpa.toFixed(2)}` },
+          { label: "CTR", value: `${(totals.ctr * 100).toFixed(2)}%` },
+        ]}
+      />
 
       <Section title="Daily conversions">
         <ConversionsChart data={daily.map((day) => ({ date: day.date, conversions: day.conversions }))} />
@@ -66,7 +67,7 @@ export default async function CampaignDashboardPage({
 
       <Section title="Per-creative performance">
         {perCreative.length === 0 ? (
-          <EmptyState icon={IconTrendingUp} title="No metrics yet" />
+          <EmptyState title="No metrics yet" />
         ) : (
           <Table>
             <THead>
@@ -80,12 +81,12 @@ export default async function CampaignDashboardPage({
             <TBody>
               {perCreative.map((creative) => (
                 <TR key={creative.creativeId}>
-                  <TD className="text-xs text-slate-400">{creative.creativeId.slice(0, 8)}</TD>
-                  <TD>₹{creative.spend.toFixed(2)}</TD>
-                  <TD>{creative.clicks}</TD>
-                  <TD>{creative.conversions}</TD>
-                  <TD>₹{creative.cpa.toFixed(2)}</TD>
-                  <TD>{(creative.ctr * 100).toFixed(2)}%</TD>
+                  <TD className="tabular text-xs text-muted">{creative.creativeId.slice(0, 8)}</TD>
+                  <TD className="tabular">₹{creative.spend.toFixed(2)}</TD>
+                  <TD className="tabular">{creative.clicks}</TD>
+                  <TD className="tabular">{creative.conversions}</TD>
+                  <TD className="tabular">₹{creative.cpa.toFixed(2)}</TD>
+                  <TD className="tabular">{(creative.ctr * 100).toFixed(2)}%</TD>
                 </TR>
               ))}
             </TBody>

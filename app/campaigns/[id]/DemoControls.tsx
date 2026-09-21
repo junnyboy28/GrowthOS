@@ -63,7 +63,7 @@ export function DemoControls({ campaignId }: { campaignId: string }) {
   return (
     <Card className="border-dashed">
       <CardBody>
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">
           Demo controls (dev only)
         </h2>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -80,8 +80,8 @@ export function DemoControls({ campaignId }: { campaignId: string }) {
             {pending === "run-loop" ? "Running…" : "Run loop"}
           </Button>
         </div>
-        {message && <p className="mt-2 text-xs text-emerald-700">{message}</p>}
-        {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+        {message && <p className="mt-2 text-xs text-money">{message}</p>}
+        {error && <p className="mt-2 text-xs text-stop">{error}</p>}
       </CardBody>
     </Card>
   );
