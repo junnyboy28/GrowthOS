@@ -58,7 +58,7 @@ function BusinessSwitcher({ currentId }: { currentId: string }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 rounded-sm px-2 py-1 text-sm font-medium text-ink hover:bg-ink/5"
+        className="flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium text-ink hover:bg-ink/5"
       >
         {current?.name ?? "…"}
         <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-muted">
@@ -66,7 +66,7 @@ function BusinessSwitcher({ currentId }: { currentId: string }) {
         </svg>
       </button>
       {open && (
-        <div className="absolute left-0 top-full z-30 mt-1 w-56 rounded-sm border border-line bg-surface py-1 shadow-[0_4px_16px_rgba(20,23,28,0.08)]">
+        <div className="absolute left-0 top-full z-30 mt-1 w-56 rounded-md border border-line bg-surface py-1 shadow-[0_4px_16px_rgba(20,23,28,0.08)]">
           {businesses.map((business) => (
             <button
               key={business.id}
@@ -124,7 +124,7 @@ export function ConsoleHeader() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "rounded-sm px-2.5 py-1.5 font-medium",
+                  "rounded-md px-2.5 py-1.5 font-medium",
                   active ? "bg-signal/10 text-signal" : "text-muted hover:bg-ink/5 hover:text-ink",
                 )}
               >

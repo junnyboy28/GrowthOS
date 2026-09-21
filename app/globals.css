@@ -5,14 +5,18 @@
   --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
 
   --color-ink: #14171c;
-  --color-muted: #83806f;
-  --color-paper: #f6f5f1;
+  --color-muted: #6f6c5e;
+  --color-paper: #edeae1;
   --color-surface: #ffffff;
-  --color-line: #ddd9ce;
+  --color-line: #d3cdbe;
   --color-signal: #1f4fff;
+  --color-signal-hover: #173bcc;
   --color-money: #0e7a5c;
+  --color-money-hover: #0a5f47;
   --color-caution: #b5650c;
+  --color-caution-hover: #93520a;
   --color-stop: #b23a2e;
+  --color-stop-hover: #942e24;
 }
 
 html {

@@ -32,7 +32,7 @@ export default async function BusinessPage({
   const budgetPct = business.monthlyBudget > 0 ? Math.round((stats.spendLast30d / business.monthlyBudget) * 100) : 0;
 
   return (
-    <main className="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-10">
+    <main className="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10">
       <PageHeader
         eyebrow={`${business.industry} · ${business.location}`}
         title={business.name}

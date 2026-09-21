@@ -108,7 +108,7 @@ export function CampaignPanel({ initialCampaign }: CampaignPanelProps) {
               )}
 
               {outcome && (
-                <Card className="bg-paper">
+                <Card className="border-line bg-paper shadow-none">
                   <CardBody className="p-3">
                     <p className="text-xs font-medium uppercase text-muted">
                       Policy decision: {outcome.status}

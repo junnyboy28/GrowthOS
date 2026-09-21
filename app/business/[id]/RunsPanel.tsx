@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Goal, Run } from "@/lib/db/schema";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
+import { IconChevronRight } from "@/components/icons";
 
 interface RunsPanelProps {
   goals: Goal[];
@@ -99,7 +99,7 @@ export function RunsPanel({ goals, initialRuns }: RunsPanelProps) {
       </ul>
 
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-ink">Runs</h3>
+        <h3 className="mb-2.5 text-base font-bold tracking-tight text-ink">Runs</h3>
         {runs.length === 0 ? (
           <EmptyState title="No runs yet" description="Start a run above to kick off the pipeline." />
         ) : (
@@ -112,17 +112,15 @@ export function RunsPanel({ goals, initialRuns }: RunsPanelProps) {
             </THead>
             <TBody>
               {runs.map((run) => (
-                <TR key={run.id}>
-                  <TD>{run.stage}</TD>
+                <TR key={run.id} href={`/runs/${run.id}`}>
+                  <TD className="font-medium">{run.stage}</TD>
                   <TD>
                     <StatusBadge status={run.status} />
                     {run.error && <span className="ml-2 text-xs text-stop">{run.error}</span>}
                   </TD>
                   <TD className="tabular text-xs text-muted">{new Date(run.startedAt).toLocaleString()}</TD>
-                  <TD>
-                    <Link href={`/runs/${run.id}`} className="text-sm font-medium text-signal hover:underline">
-                      View
-                    </Link>
+                  <TD className="text-right">
+                    <IconChevronRight className="ml-auto h-4 w-4 text-muted" />
                   </TD>
                 </TR>
               ))}

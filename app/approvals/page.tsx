@@ -27,7 +27,7 @@ export default async function ApprovalsPage() {
   });
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-10">
+    <main className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-10">
       <PageHeader
         eyebrow="Human in the loop"
         title="Approvals"

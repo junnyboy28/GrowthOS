@@ -16,19 +16,24 @@ const TONE_TEXT: Record<NonNullable<Metric["tone"]>, string> = {
 
 export function MetricsStrip({ metrics, className }: { metrics: Metric[]; className?: string }) {
   return (
-    <div className={cn("flex flex-col divide-y divide-line border border-line sm:flex-row sm:divide-x sm:divide-y-0", className)}>
+    <div
+      className={cn(
+        "flex flex-col divide-y divide-line rounded-md border border-line bg-surface shadow-sm sm:flex-row sm:divide-x sm:divide-y-0",
+        className,
+      )}
+    >
       {metrics.map((metric) => (
-        <div key={metric.label} className="flex-1 px-4 py-3">
-          <p className="text-xs text-muted">{metric.label}</p>
+        <div key={metric.label} className="flex-1 px-5 py-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted">{metric.label}</p>
           <p
             className={cn(
-              "tabular mt-1 text-lg font-semibold",
+              "tabular mt-1.5 text-2xl font-bold",
               metric.tone ? TONE_TEXT[metric.tone] : "text-ink",
             )}
           >
             {metric.value}
           </p>
-          {metric.hint && <p className="mt-0.5 text-xs text-muted">{metric.hint}</p>}
+          {metric.hint && <p className="mt-1 text-xs text-muted">{metric.hint}</p>}
         </div>
       ))}
     </div>
