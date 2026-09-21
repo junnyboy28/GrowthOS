@@ -6,6 +6,9 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ApprovalCard, type ApprovalItem } from "./ApprovalCard";
 
+// Pending approvals change from other pages/actions — must read fresh on every request.
+export const dynamic = "force-dynamic";
+
 export default async function ApprovalsPage() {
   const pending = await getPendingRecommendationsWithContext();
 

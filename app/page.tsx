@@ -1,10 +1,15 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { getAllBusinessSummaries } from "@/lib/db/queries/dashboard";
+import { BusinessConsole } from "@/components/BusinessConsole";
 import { LinkButton } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Table, TBody, TD, TH, THead, TR } from "@/components/ui/Table";
+
+// This page reads live business/campaign data and must never be statically prerendered at build
+// time — Next.js would otherwise happily cache whatever the DB looked like the moment `next
+// build` ran and serve that forever, silently ignoring every reset/onboard/launch after.
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const summaries = await getAllBusinessSummaries();
@@ -26,7 +31,7 @@ export default async function Home() {
   }
 
   if (summaries.length === 1) {
-    redirect(`/business/${summaries[0].business.id}`);
+    return <BusinessConsole businessId={summaries[0].business.id} />;
   }
 
   return (

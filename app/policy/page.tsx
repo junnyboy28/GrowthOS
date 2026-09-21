@@ -11,6 +11,9 @@ const DECISION_TONE: Record<string, Tone> = {
   block: "danger",
 };
 
+// Live audit log — must read fresh on every request, not get baked in at build time.
+export const dynamic = "force-dynamic";
+
 export default async function PolicyPage() {
   const [decisions, actions] = await Promise.all([
     getRecentPolicyDecisions(50),

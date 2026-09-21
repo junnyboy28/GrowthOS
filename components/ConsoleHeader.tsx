@@ -16,17 +16,8 @@ const NAV_LINKS = [
   { href: "/system", label: "System" },
 ];
 
-function useCurrentBusinessId(): string | null {
-  const pathname = usePathname();
-  const match = pathname.match(/^\/business\/([^/]+)/);
-  return match ? match[1] : null;
-}
-
-function BusinessSwitcher({ currentId }: { currentId: string }) {
-  const router = useRouter();
+function useBusinesses(): BusinessOption[] {
   const [businesses, setBusinesses] = useState<BusinessOption[]>([]);
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -40,6 +31,33 @@ function BusinessSwitcher({ currentId }: { currentId: string }) {
       cancelled = true;
     };
   }, []);
+
+  return businesses;
+}
+
+/** The business a viewer is "in": a direct /business/[id] URL names it explicitly. At "/" there's
+ * no id in the URL, but app/page.tsx renders that exact business's console with no redirect when
+ * there's exactly one — so once the business list loads, treat that as being in that business
+ * too, or the switcher (and the sense of "where am I") disappears on the one URL people land on
+ * most. */
+function useCurrentBusinessId(businesses: BusinessOption[]): string | null {
+  const pathname = usePathname();
+  const match = pathname.match(/^\/business\/([^/]+)/);
+  if (match) return match[1];
+  if (pathname === "/" && businesses.length === 1) return businesses[0].id;
+  return null;
+}
+
+function BusinessSwitcher({
+  businesses,
+  currentId,
+}: {
+  businesses: BusinessOption[];
+  currentId: string;
+}) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {
@@ -99,7 +117,8 @@ function BusinessSwitcher({ currentId }: { currentId: string }) {
 
 export function ConsoleHeader() {
   const pathname = usePathname();
-  const currentBusinessId = useCurrentBusinessId();
+  const businesses = useBusinesses();
+  const currentBusinessId = useCurrentBusinessId(businesses);
 
   return (
     <header className="border-b border-line bg-surface">
@@ -113,7 +132,7 @@ export function ConsoleHeader() {
         {currentBusinessId && (
           <>
             <span className="text-line">/</span>
-            <BusinessSwitcher currentId={currentBusinessId} />
+            <BusinessSwitcher businesses={businesses} currentId={currentBusinessId} />
           </>
         )}
         <nav className="ml-auto flex items-center gap-1 text-sm">
