@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getAllBusinessSummaries } from "@/lib/db/queries/dashboard";
-import { BusinessConsole } from "@/components/BusinessConsole";
 import { LinkButton } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -30,10 +29,8 @@ export default async function Home() {
     );
   }
 
-  if (summaries.length === 1) {
-    return <BusinessConsole businessId={summaries[0].business.id} />;
-  }
-
+  // Always a neutral landing page — even with exactly one business, "/" stays distinct from that
+  // business's console at /business/[id], rather than collapsing into it.
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-10">
       <PageHeader

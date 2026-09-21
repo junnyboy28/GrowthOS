@@ -35,17 +35,13 @@ function useBusinesses(): BusinessOption[] {
   return businesses;
 }
 
-/** The business a viewer is "in": a direct /business/[id] URL names it explicitly. At "/" there's
- * no id in the URL, but app/page.tsx renders that exact business's console with no redirect when
- * there's exactly one — so once the business list loads, treat that as being in that business
- * too, or the switcher (and the sense of "where am I") disappears on the one URL people land on
- * most. */
-function useCurrentBusinessId(businesses: BusinessOption[]): string | null {
+/** The business a viewer is "in" — only a direct /business/[id] URL names one explicitly. "/" is
+ * a neutral landing page regardless of how many businesses exist, so it never counts as being
+ * inside a business, and the switcher stays hidden there. */
+function useCurrentBusinessId(): string | null {
   const pathname = usePathname();
   const match = pathname.match(/^\/business\/([^/]+)/);
-  if (match) return match[1];
-  if (pathname === "/" && businesses.length === 1) return businesses[0].id;
-  return null;
+  return match ? match[1] : null;
 }
 
 function BusinessSwitcher({
@@ -118,7 +114,7 @@ function BusinessSwitcher({
 export function ConsoleHeader() {
   const pathname = usePathname();
   const businesses = useBusinesses();
-  const currentBusinessId = useCurrentBusinessId(businesses);
+  const currentBusinessId = useCurrentBusinessId();
 
   return (
     <header className="border-b border-line bg-surface">
