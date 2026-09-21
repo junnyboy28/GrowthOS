@@ -161,6 +161,18 @@ Do a full walkthrough yourself from reset to an executed optimization and fix an
 
 ---
 
+## Known gaps (post-Phase-9 UI redesign)
+
+- **Business console's "Spend (trailing 30d)" metric is untested against a real live
+  campaign.** `lib/db/queries/dashboard.ts`'s `getBusinessConsoleStats` sums each live
+  campaign's own independent trailing-30-day window (not real-calendar-month-to-date — same
+  reasoning as `analytics.ts`'s windowing, see that function's comment) rather than anchoring
+  multiple live campaigns to one shared calendar period. As of this note the seeded world has
+  zero live campaigns, so this has only been exercised with an empty list. Before trusting it
+  in a demo: launch a campaign (or two, to check the multi-campaign sum), let the simulator
+  tick some days, and confirm the number on `/business/[id]` matches `aggregateTotals` on that
+  campaign's own dashboard for the same trailing window.
+
 ## After the hackathon (not now)
 
 - Real `TavilySearch` adapter (free tier), swap via env.

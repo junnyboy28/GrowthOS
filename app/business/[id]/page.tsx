@@ -26,6 +26,9 @@ export default async function BusinessPage({
   ]);
 
   const lastDecision = lastDecisions[0];
+  // Approximate on purpose: spendLast30d is a trailing 30-day window (see dashboard.ts), not
+  // calendar-month-to-date, so this % is spend-per-30d against a monthly cap, not a true MTD
+  // burn rate. The copy below says so rather than implying they're the same period.
   const budgetPct = business.monthlyBudget > 0 ? Math.round((stats.spendLast30d / business.monthlyBudget) * 100) : 0;
 
   return (
@@ -44,9 +47,9 @@ export default async function BusinessPage({
             tone: stats.liveCampaigns.length > 0 ? "money" : undefined,
           },
           {
-            label: "Spend (last 30d)",
-            value: `₹${stats.spendLast30d.toLocaleString("en-IN", { maximumFractionDigits: 0 })} / ₹${business.monthlyBudget.toLocaleString("en-IN")}`,
-            hint: `${budgetPct}% of monthly budget`,
+            label: "Spend (trailing 30d)",
+            value: `₹${stats.spendLast30d.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`,
+            hint: `${budgetPct}% of ₹${business.monthlyBudget.toLocaleString("en-IN")}/mo budget (approx. — 30d window, not calendar month)`,
           },
           {
             label: "Approvals pending",

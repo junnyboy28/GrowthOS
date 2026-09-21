@@ -50,10 +50,22 @@ export async function listBusinesses(): Promise<Pick<Business, "id" | "name">[]>
 
 export interface BusinessConsoleStats {
   liveCampaigns: CampaignRow[];
-  /** Spend across this business's live campaigns, windowed to each campaign's own most recent
-   * 30 days of data — not the real calendar month. The mock world's dates aren't anchored to
-   * actual "now" (seeded historical campaigns in particular), so a real-calendar-month filter
-   * would silently read as ₹0 the same way analytics.ts's window bug once did. */
+  /**
+   * Deliberately a trailing 30-day window per campaign, NOT real-calendar-month-to-date — same
+   * reasoning as analytics.ts's windowing: the mock world's dates aren't anchored to actual
+   * "now" (seeded historical campaigns in particular), so a real-calendar filter would silently
+   * read ₹0 the same way analytics.ts's window bug once did, and that failure mode is strictly
+   * worse than "approximate but always populated." The UI's copy has to stay honest about this
+   * (say "last 30d", never "this month") — see business/[id]/page.tsx.
+   *
+   * When more than one campaign is live, this SUMS each campaign's own independent trailing
+   * window rather than anchoring all of them to one shared calendar period. Each campaign has
+   * its own timeline (its own start date, its own most recent tick), so a shared anchor would
+   * reintroduce the same wall-clock mismatch this function exists to avoid — e.g. a campaign
+   * whose data lags a day behind its sibling would have its most recent real day cut off, or a
+   * gap silently counted as zero-spend. Sum-of-independent-windows is untested against a real
+   * multi-live-campaign business — see BUILD_PLAN.md's "Known gaps" note.
+   */
   spendLast30d: number;
   pendingApprovalsCount: number;
 }
