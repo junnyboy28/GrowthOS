@@ -161,17 +161,39 @@ Do a full walkthrough yourself from reset to an executed optimization and fix an
 
 ---
 
-## Known gaps (post-Phase-9 UI redesign)
+## Known gaps
 
-- **Business console's "Spend (trailing 30d)" metric is untested against a real live
-  campaign.** `lib/db/queries/dashboard.ts`'s `getBusinessConsoleStats` sums each live
+- **Business console's "Spend (trailing 30d)" metric — verified for one live campaign, still
+  untested for two+.** `lib/db/queries/dashboard.ts`'s `getBusinessConsoleStats` sums each live
   campaign's own independent trailing-30-day window (not real-calendar-month-to-date — same
-  reasoning as `analytics.ts`'s windowing, see that function's comment) rather than anchoring
-  multiple live campaigns to one shared calendar period. As of this note the seeded world has
-  zero live campaigns, so this has only been exercised with an empty list. Before trusting it
-  in a demo: launch a campaign (or two, to check the multi-campaign sum), let the simulator
-  tick some days, and confirm the number on `/business/[id]` matches `aggregateTotals` on that
-  campaign's own dashboard for the same trailing window.
+  reasoning as `analytics.ts`'s windowing). Verified 2026-09-21 with a real onboard → research →
+  strategy → content → approve → campaign → launch → tick 7d run: the console showed ₹6,170,
+  which matched both that campaign's own dashboard total and `sum(campaign_metrics.spend)` in
+  the DB exactly (all 7 days fell inside the 30-day window, so this run couldn't exercise the
+  windowing boundary itself). Still open: a business with two or more live campaigns on
+  different timelines, to confirm the sum-of-independent-windows choice behaves as intended
+  rather than one campaign's window silently dominating.
+
+## Verified against the real Anthropic API (2026-09-21)
+
+First time this pipeline ran end-to-end with real model calls rather than mocked ones (the
+Console billing block that blocked every prior phase is now resolved). Full walkthrough passed:
+research → strategy → content → creative approval → campaign → policy-gated launch approval →
+live → 7 simulated days → analytics → optimization loop (auto-executed `decrease_budget`,
+`shift_allocation`, `no_action`, all policy-gated, none required approval this time) — 10 LLM
+calls, ₹12.37 total. One real bug found and fixed along the way, both changes in
+`lib/llm/structured.ts` / `lib/schemas/researchOutput.ts` / `lib/pipeline/research.ts`:
+
+1. The research stage's schema required the LLM to transcribe the full `evidence` array back,
+   even though the caller already deterministically rebuilds it from the source bundle and
+   discards whatever the model sent. Split it into `ResearchLlmOutputSchema` (what the model
+   produces) vs. `ResearchOutputSchema` (the persisted type, with `evidence` added back
+   deterministically) — cheaper and removes a field that's pure waste for the model to emit.
+2. The research call hit the hardcoded 4096 output-token cap in `structured()` twice in the same
+   run (citing across four claim categories against ~70+ evidence items runs long), which
+   surfaced as a confusing "missing required field" schema error rather than an obvious
+   truncation error. `maxTokens` is now a configurable `StructuredOptions` field (default 4096),
+   and research.ts passes 8192.
 
 ## After the hackathon (not now)
 

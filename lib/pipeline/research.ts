@@ -6,7 +6,11 @@ import { getGoalById } from "@/lib/db/queries/goals";
 import { getCompetitorsForBusiness, getReviewsForBusiness } from "@/lib/db/queries/mock";
 import { structured } from "@/lib/llm/structured";
 import type { EvidenceItem } from "@/lib/schemas/evidence";
-import { ResearchOutputSchema, type ResearchOutput } from "@/lib/schemas/researchOutput";
+import {
+  ResearchLlmOutputSchema,
+  type ResearchLlmOutput,
+  type ResearchOutput,
+} from "@/lib/schemas/researchOutput";
 import type { StageContext } from "./stage";
 import { researchSystemPrompt, researchUserPrompt } from "./research.prompt";
 
@@ -111,7 +115,7 @@ class InvalidSourceIdsError extends Error {
   }
 }
 
-function collectCitedIds(output: ResearchOutput): string[] {
+function collectCitedIds(output: ResearchLlmOutput): string[] {
   return [
     ...output.target_segments.flatMap((segment) => segment.source_ids),
     ...output.competitors.flatMap((competitor) => competitor.source_ids),
@@ -139,7 +143,10 @@ async function callResearchLlm(params: {
       model,
       system: researchSystemPrompt(business),
       user: researchUserPrompt({ goal, evidenceBundle, correctionNote }),
-      schema: ResearchOutputSchema,
+      schema: ResearchLlmOutputSchema,
+      // Citing across four claim categories against a bundle of ~70+ evidence items runs long —
+      // a real run hit the default 4096 cap twice. See StructuredOptions.maxTokens.
+      maxTokens: 8192,
       runId,
       stage: STAGE_NAME,
     });

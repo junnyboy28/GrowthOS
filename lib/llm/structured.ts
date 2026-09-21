@@ -12,6 +12,11 @@ export interface StructuredOptions<T> {
   schema: z.ZodType<T>;
   runId: string | null;
   stage: string;
+  /** Defaults to 4096. Raise for stages whose output legitimately runs large (e.g. research,
+   * citing many items across several categories) — a real run hit this cap twice (exactly 4096
+   * output tokens both times) before failing schema validation on the fields that got cut off,
+   * which looked like the model omitting required fields but was actually truncation. */
+  maxTokens?: number;
 }
 
 const TOOL_NAME = "emit_output";
@@ -71,7 +76,7 @@ async function logCall(entry: {
  * every attempt to llm_calls, then throws if the retry also fails.
  */
 export async function structured<T>(opts: StructuredOptions<T>): Promise<T> {
-  const { model, system, user, schema, runId, stage } = opts;
+  const { model, system, user, schema, runId, stage, maxTokens = 4096 } = opts;
   const client = getAnthropicClient();
   const { inputSchema, wrapped } = buildToolInputSchema(schema);
 
@@ -85,7 +90,7 @@ export async function structured<T>(opts: StructuredOptions<T>): Promise<T> {
     const startedAt = Date.now();
     const response = await client.messages.create({
       model,
-      max_tokens: 4096,
+      max_tokens: maxTokens,
       system,
       messages: [{ role: "user", content: userMessage }],
       tools: [tool],
