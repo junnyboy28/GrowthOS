@@ -1,13 +1,16 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, ne } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { goals, llmCalls, runs, type LlmCallRow, type Run } from "@/lib/db/schema";
 
 export async function getRunsForBusiness(businessId: string): Promise<Run[]> {
   const db = getDb();
+  // Excludes the synthetic stage:"seed" row the seed script inserts to link historical
+  // campaigns to a business (see lib/mock/seed.ts) — it's bookkeeping, not a pipeline run anyone
+  // triggered, so listing it as a "run" reads as unexplained activity right after a fresh reset.
   return db
     .select()
     .from(runs)
-    .where(eq(runs.businessId, businessId))
+    .where(and(eq(runs.businessId, businessId), ne(runs.stage, "seed")))
     .orderBy(desc(runs.startedAt));
 }
 

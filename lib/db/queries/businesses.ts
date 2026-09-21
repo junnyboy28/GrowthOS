@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { businesses, goals, type Business, type Goal } from "@/lib/db/schema";
 
@@ -54,10 +54,14 @@ export async function getBusinessWithGoals(
     return null;
   }
 
+  // Excludes "archived" — the seed script creates one archived placeholder goal per business to
+  // hang the 40 historical campaigns off of (see lib/mock/seed.ts), and it isn't something anyone
+  // ever created or would recognize as their own goal, so it shouldn't appear in a list of goals
+  // to start a run against.
   const businessGoals = await db
     .select()
     .from(goals)
-    .where(eq(goals.businessId, id))
+    .where(and(eq(goals.businessId, id), eq(goals.status, "active")))
     .orderBy(desc(goals.createdAt));
 
   return { business, goals: businessGoals };

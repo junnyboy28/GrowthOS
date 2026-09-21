@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useRef } from "react";
-import { SEED_BUSINESS } from "@/lib/mock/data/business";
+import { SEED_BUSINESS, SEED_GOAL_TEXT } from "@/lib/mock/data/business";
 import { Button } from "@/components/ui/Button";
 import { Field, Input, Label, Select, Textarea } from "@/components/ui/Field";
 import { createBusinessAction, type ActionState } from "./actions";
@@ -14,8 +14,6 @@ const INDUSTRIES = [
   { value: "home-services", label: "Home Services" },
   { value: "other", label: "Other" },
 ] as const;
-
-const SEED_GOAL_TEXT = "Increase weekend dinner reservations by 20% over the next 3 months";
 
 const initialState: ActionState = {};
 

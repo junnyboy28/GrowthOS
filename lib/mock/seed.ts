@@ -34,7 +34,7 @@ import {
   type Creative,
 } from "@/lib/schemas/creativeSet";
 import { StrategySchema, type Strategy } from "@/lib/schemas/strategy";
-import { SEED_BUSINESS } from "./data/business";
+import { SEED_BUSINESS, SEED_GOAL_TEXT } from "./data/business";
 import { SEED_COMPETITORS } from "./data/competitors";
 import { SEED_SEARCH_FIXTURES } from "./data/searchFixtures";
 import { AUDIENCE_SEGMENTS } from "./data/audienceSegments";
@@ -221,6 +221,16 @@ async function main() {
         finishedAt: new Date(),
       })
       .returning();
+
+    // A second, real (status: "active") goal — the archived one above exists only to hang the
+    // historical campaigns off of and is hidden from the UI (see getBusinessWithGoals), so
+    // without this a fresh reset would leave the seeded business with nothing to start a run
+    // against, or force using a throwaway onboarding-created business with no competitor/review
+    // data of its own.
+    await tx.insert(goals).values({
+      businessId: business.id,
+      text: SEED_GOAL_TEXT,
+    });
 
     const [strategy] = await tx
       .insert(strategies)
