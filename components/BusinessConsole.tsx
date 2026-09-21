@@ -40,21 +40,28 @@ export async function BusinessConsole({ businessId }: { businessId: string }) {
       />
 
       <MetricsStrip
+        animate
         metrics={[
           {
             label: "Live campaigns",
             value: String(stats.liveCampaigns.length),
-            tone: stats.liveCampaigns.length > 0 ? "money" : undefined,
+            tone: stats.liveCampaigns.length > 0 ? "signal" : undefined,
+            animateFrom: stats.liveCampaigns.length,
+            format: "integer",
           },
           {
             label: "Spend (trailing 30d)",
             value: `₹${stats.spendLast30d.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`,
             hint: `${budgetPct}% of ₹${business.monthlyBudget.toLocaleString("en-IN")}/mo budget (approx. — 30d window, not calendar month)`,
+            animateFrom: stats.spendLast30d,
+            format: "currency-inr",
           },
           {
             label: "Approvals pending",
             value: String(stats.pendingApprovalsCount),
             tone: stats.pendingApprovalsCount > 0 ? "caution" : undefined,
+            animateFrom: stats.pendingApprovalsCount,
+            format: "integer",
           },
           {
             label: "Last policy decision",

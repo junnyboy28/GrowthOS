@@ -119,11 +119,9 @@ export function ConsoleHeader() {
   return (
     <header className="border-b border-line bg-surface">
       <div className="mx-auto flex h-12 max-w-5xl items-center gap-1 px-6">
-        <Link
-          href="/"
-          className="mr-2 font-mono text-sm font-semibold tracking-wider text-ink"
-        >
-          GROWTHOS
+        <Link href="/" className="mr-2 font-mono text-base font-bold tracking-tight">
+          <span className="text-ink">GROWTH</span>
+          <span className="text-signal">OS</span>
         </Link>
         {currentBusinessId && (
           <>

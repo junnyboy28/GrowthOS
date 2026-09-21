@@ -1,3 +1,4 @@
+import { AnimatedNumber, type NumberFormat } from "./AnimatedNumber";
 import { cn } from "./cn";
 
 export interface Metric {
@@ -5,6 +6,13 @@ export interface Metric {
   value: string;
   hint?: string;
   tone?: "money" | "caution" | "stop" | "signal";
+  /** Present only on genuinely countable metrics. Paired with `format`, lets the strip count up
+   * from 0 to this value on mount when the strip's own `animate` prop is on. Metrics without this
+   * (e.g. a status word like "require approval") always render `value` statically. A plain string
+   * tag rather than a formatter function — MetricsStrip is a Server Component, and functions
+   * can't be passed from a server-rendered tree into AnimatedNumber (a Client Component). */
+  animateFrom?: number;
+  format?: NumberFormat;
 }
 
 const TONE_TEXT: Record<NonNullable<Metric["tone"]>, string> = {
@@ -14,7 +22,16 @@ const TONE_TEXT: Record<NonNullable<Metric["tone"]>, string> = {
   signal: "text-signal",
 };
 
-export function MetricsStrip({ metrics, className }: { metrics: Metric[]; className?: string }) {
+export function MetricsStrip({
+  metrics,
+  className,
+  animate = false,
+}: {
+  metrics: Metric[];
+  className?: string;
+  /** The one orchestrated motion moment lives here — only the business console turns this on. */
+  animate?: boolean;
+}) {
   return (
     <div
       className={cn(
@@ -27,13 +44,17 @@ export function MetricsStrip({ metrics, className }: { metrics: Metric[]; classN
           <p className="text-xs font-medium uppercase tracking-wide text-muted">{metric.label}</p>
           <p
             className={cn(
-              "tabular mt-1.5 text-2xl font-bold",
+              "tabular mt-2 text-4xl font-extrabold tracking-tight",
               metric.tone ? TONE_TEXT[metric.tone] : "text-ink",
             )}
           >
-            {metric.value}
+            {animate && metric.animateFrom !== undefined && metric.format ? (
+              <AnimatedNumber to={metric.animateFrom} format={metric.format} />
+            ) : (
+              metric.value
+            )}
           </p>
-          {metric.hint && <p className="mt-1 text-xs text-muted">{metric.hint}</p>}
+          {metric.hint && <p className="mt-1.5 text-xs text-muted">{metric.hint}</p>}
         </div>
       ))}
     </div>
