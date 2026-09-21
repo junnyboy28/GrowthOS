@@ -1,11 +1,12 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @theme inline {
   --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
 
   --color-ink: #14171c;
-  --color-muted: #6f6c5e;
   --color-paper: #edeae1;
   --color-surface: #ffffff;
   --color-line: #d3cdbe;
@@ -17,6 +18,31 @@
   --color-caution-hover: #93520a;
   --color-stop: #b23a2e;
   --color-stop-hover: #942e24;
+
+  /* shadcn/ui's semantic tokens, fed OUR palette rather than its defaults — this is what lets
+   * shadcn primitives (Button, Table, dropdown-menu, ...) pick up correct fill/hover/focus states
+   * without hand-describing each one per component. `muted`/`muted-foreground` doubles as our
+   * general secondary-text color (`text-muted-foreground`, used everywhere) and its background
+   * counterpart. */
+  --color-background: var(--color-paper);
+  --color-foreground: var(--color-ink);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-ink);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-ink);
+  --color-primary: var(--color-signal);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--color-surface);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted: var(--color-paper);
+  --color-muted-foreground: #6f6c5e;
+  --color-accent: var(--color-paper);
+  --color-accent-foreground: var(--color-ink);
+  --color-destructive: var(--color-stop);
+  --color-destructive-foreground: #ffffff;
+  --color-border: var(--color-line);
+  --color-input: var(--color-line);
+  --color-ring: var(--color-signal);
 }
 
 html {

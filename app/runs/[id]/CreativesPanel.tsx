@@ -7,7 +7,7 @@ import { Badge, type Tone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody, Section } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { cn } from "@/components/ui/cn";
+import { cn } from "@/lib/utils";
 import { IconCheck, IconRefresh, IconX } from "@/components/icons";
 
 interface CreativesPanelProps {
@@ -109,10 +109,10 @@ export function CreativesPanel({ runId, initialCreatives }: CreativesPanelProps)
                   </Badge>
                 </div>
                 <p className="font-medium text-ink">{creative.headline}</p>
-                <p className="italic text-muted">{creative.hook}</p>
-                <p className="text-muted">{creative.caption}</p>
-                <p className="text-xs text-muted">CTA: {creative.cta}</p>
-                <p className="text-xs text-muted">Image prompt: {creative.image_prompt}</p>
+                <p className="italic text-muted-foreground">{creative.hook}</p>
+                <p className="text-muted-foreground">{creative.caption}</p>
+                <p className="text-xs text-muted-foreground">CTA: {creative.cta}</p>
+                <p className="text-xs text-muted-foreground">Image prompt: {creative.image_prompt}</p>
 
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Button
@@ -154,7 +154,7 @@ export function CreativesPanel({ runId, initialCreatives }: CreativesPanelProps)
           {continued ? "Continuing…" : continuePending ? "Continuing…" : "Continue"}
         </Button>
         {!hasApproved && !continued && (
-          <span className="text-xs text-muted">Approve at least one creative to continue.</span>
+          <span className="text-xs text-muted-foreground">Approve at least one creative to continue.</span>
         )}
         {continueError && <span className="text-sm text-stop">{continueError}</span>}
       </div>

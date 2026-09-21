@@ -1,9 +1,9 @@
-import { cn } from "./cn";
+import { cn } from "@/lib/utils";
 
 export type Tone = "neutral" | "success" | "warning" | "danger" | "info";
 
 const TONE: Record<Tone, string> = {
-  neutral: "bg-ink/5 text-muted",
+  neutral: "bg-ink/5 text-muted-foreground",
   success: "bg-money/10 text-money",
   warning: "bg-caution/10 text-caution",
   danger: "bg-stop/10 text-stop",

@@ -15,24 +15,24 @@ export function ActionsTimeline({ actions }: { actions: ActionRow[] }) {
                 <CardBody className="text-sm">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-ink">{action.method}</span>
-                    <span className="text-xs text-muted">{action.createdAt.toLocaleString()}</span>
+                    <span className="text-xs text-muted-foreground">{action.createdAt.toLocaleString()}</span>
                   </div>
-                  <div className="mt-2 grid grid-cols-2 gap-3 text-xs text-muted">
+                  <div className="mt-2 grid grid-cols-2 gap-3 text-xs text-muted-foreground">
                     <div>
-                      <p className="font-medium text-muted">Before</p>
+                      <p className="font-medium text-muted-foreground">Before</p>
                       <pre className="mt-0.5 overflow-x-auto rounded-md bg-paper p-2">
                         {JSON.stringify(action.before)}
                       </pre>
                     </div>
                     <div>
-                      <p className="font-medium text-muted">After</p>
+                      <p className="font-medium text-muted-foreground">After</p>
                       <pre className="mt-0.5 overflow-x-auto rounded-md bg-paper p-2">
                         {JSON.stringify(action.after)}
                       </pre>
                     </div>
                   </div>
                   {action.recommendationId && (
-                    <p className="mt-2 text-xs text-muted">
+                    <p className="mt-2 text-xs text-muted-foreground">
                       From recommendation {action.recommendationId.slice(0, 8)}
                     </p>
                   )}

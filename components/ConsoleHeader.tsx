@@ -2,8 +2,16 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/components/ui/cn";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/DropdownMenu";
+import { IconChevronRight } from "@/components/icons";
 
 interface BusinessOption {
   id: string;
@@ -52,62 +60,35 @@ function BusinessSwitcher({
   currentId: string;
 }) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClick(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
   const current = businesses.find((b) => b.id === currentId);
 
   return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium text-ink hover:bg-ink/5"
-      >
-        {current?.name ?? "…"}
-        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-muted">
-          <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
-      {open && (
-        <div className="absolute left-0 top-full z-30 mt-1 w-56 rounded-md border border-line bg-surface py-1 shadow-[0_4px_16px_rgba(20,23,28,0.08)]">
-          {businesses.map((business) => (
-            <button
-              key={business.id}
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                router.push(`/business/${business.id}`);
-              }}
-              className={cn(
-                "flex w-full items-center px-3 py-1.5 text-left text-sm hover:bg-paper",
-                business.id === currentId ? "font-medium text-ink" : "text-muted",
-              )}
-            >
-              {business.name}
-            </button>
-          ))}
-          <div className="my-1 border-t border-line" />
-          <Link
-            href="/onboarding"
-            onClick={() => setOpen(false)}
-            className="flex w-full items-center px-3 py-1.5 text-left text-sm text-signal hover:bg-paper"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium text-foreground outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {current?.name ?? "…"}
+          <IconChevronRight className="h-3.5 w-3.5 rotate-90 text-muted-foreground" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {businesses.map((business) => (
+          <DropdownMenuItem
+            key={business.id}
+            onSelect={() => router.push(`/business/${business.id}`)}
+            className={business.id === currentId ? "font-medium text-foreground" : "text-muted-foreground"}
           >
-            + Onboard business
-          </Link>
-        </div>
-      )}
-    </div>
+            {business.name}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild className="text-primary">
+          <Link href="/onboarding">+ Onboard business</Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -117,15 +98,15 @@ export function ConsoleHeader() {
   const currentBusinessId = useCurrentBusinessId();
 
   return (
-    <header className="border-b border-line bg-surface">
+    <header className="border-b border-border bg-card">
       <div className="mx-auto flex h-12 max-w-5xl items-center gap-1 px-6">
         <Link href="/" className="mr-2 font-mono text-base font-bold tracking-tight">
-          <span className="text-ink">GROWTH</span>
-          <span className="text-signal">OS</span>
+          <span className="text-foreground">GROWTH</span>
+          <span className="text-primary">OS</span>
         </Link>
         {currentBusinessId && (
           <>
-            <span className="text-line">/</span>
+            <span className="text-border">/</span>
             <BusinessSwitcher businesses={businesses} currentId={currentBusinessId} />
           </>
         )}
@@ -138,7 +119,9 @@ export function ConsoleHeader() {
                 href={link.href}
                 className={cn(
                   "rounded-md px-2.5 py-1.5 font-medium",
-                  active ? "bg-signal/10 text-signal" : "text-muted hover:bg-ink/5 hover:text-ink",
+                  active
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground",
                 )}
               >
                 {link.label}

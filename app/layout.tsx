@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import { ConsoleHeader } from "@/components/ConsoleHeader";
+import { cn } from "@/lib/utils";
 import "./globals.css";
 
 const plexSans = IBM_Plex_Sans({
@@ -25,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${plexSans.variable} ${plexMono.variable}`}>
+    <html lang="en" className={cn(plexSans.variable, plexMono.variable)}>
       <body className="min-h-screen bg-paper font-sans text-ink antialiased">
         <ConsoleHeader />
         {children}

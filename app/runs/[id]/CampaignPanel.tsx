@@ -79,14 +79,14 @@ export function CampaignPanel({ initialCampaign }: CampaignPanelProps) {
       <Card>
         <CardBody className="flex flex-col gap-2 text-sm">
           <p className="font-medium text-ink">{spec.objective}</p>
-          <p className="text-muted">Audience: {spec.audience}</p>
-          <p className="text-muted">
+          <p className="text-muted-foreground">Audience: {spec.audience}</p>
+          <p className="text-muted-foreground">
             ₹{spec.daily_budget}/day · {spec.cta} · {spec.creative_ids.length} creative(s)
           </p>
-          <p className="text-muted">
+          <p className="text-muted-foreground">
             {spec.schedule.start_date} → {spec.schedule.end_date ?? "ongoing"}
           </p>
-          <div className="flex items-center gap-2 text-xs text-muted">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <StatusBadge status={campaign.status} />
             {campaign.externalId && <span>External id: {campaign.externalId}</span>}
           </div>
@@ -110,7 +110,7 @@ export function CampaignPanel({ initialCampaign }: CampaignPanelProps) {
               {outcome && (
                 <Card className="border-line bg-paper shadow-none">
                   <CardBody className="p-3">
-                    <p className="text-xs font-medium uppercase text-muted">
+                    <p className="text-xs font-medium uppercase text-muted-foreground">
                       Policy decision: {outcome.status}
                     </p>
                     {outcome.reason && <p className="mt-1 text-ink">{outcome.reason}</p>}

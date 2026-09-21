@@ -21,12 +21,12 @@ function EvidenceExpander({
       </summary>
       <ul className="mt-1.5 flex flex-col gap-1 border-l-2 border-line pl-3">
         {cited.map((item) => (
-          <li key={item.id} className="text-xs text-muted">
-            <span className="font-medium text-muted">[{item.id}]</span> ({item.source}){" "}
+          <li key={item.id} className="text-xs text-muted-foreground">
+            <span className="font-medium text-muted-foreground">[{item.id}]</span> ({item.source}){" "}
             {item.snippet}
           </li>
         ))}
-        {cited.length === 0 && <li className="text-xs text-muted">No matching evidence found.</li>}
+        {cited.length === 0 && <li className="text-xs text-muted-foreground">No matching evidence found.</li>}
       </ul>
     </details>
   );
@@ -52,7 +52,7 @@ export function ResearchCards({ output }: { output: ResearchOutput }) {
             {output.target_segments.map((segment) => (
               <li key={segment.name} className="text-sm">
                 <p className="font-medium text-ink">{segment.name}</p>
-                <p className="text-muted">{segment.description}</p>
+                <p className="text-muted-foreground">{segment.description}</p>
                 <EvidenceExpander sourceIds={segment.source_ids} evidence={output.evidence} />
               </li>
             ))}
@@ -73,7 +73,7 @@ export function ResearchCards({ output }: { output: ResearchOutput }) {
           <ul className="flex flex-col gap-3">
             {output.opportunities.map((opportunity, index) => (
               <li key={index} className="text-sm">
-                <p className="text-muted">{opportunity.description}</p>
+                <p className="text-muted-foreground">{opportunity.description}</p>
                 <EvidenceExpander sourceIds={opportunity.source_ids} evidence={output.evidence} />
               </li>
             ))}
@@ -84,7 +84,7 @@ export function ResearchCards({ output }: { output: ResearchOutput }) {
           <ul className="flex flex-col gap-3">
             {output.pain_points.map((painPoint, index) => (
               <li key={index} className="text-sm">
-                <p className="text-muted">{painPoint.description}</p>
+                <p className="text-muted-foreground">{painPoint.description}</p>
                 <EvidenceExpander sourceIds={painPoint.source_ids} evidence={output.evidence} />
               </li>
             ))}

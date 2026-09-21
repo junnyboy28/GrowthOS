@@ -85,7 +85,7 @@ export function RunsPanel({ goals, initialRuns }: RunsPanelProps) {
               <p className="text-sm text-ink">{goal.text}</p>
               <div className="flex shrink-0 items-center gap-3">
                 {latest && (
-                  <span className="text-xs text-muted">
+                  <span className="text-xs text-muted-foreground">
                     {latest.stage} · <StatusBadge status={latest.status} />
                   </span>
                 )}
@@ -118,9 +118,9 @@ export function RunsPanel({ goals, initialRuns }: RunsPanelProps) {
                     <StatusBadge status={run.status} />
                     {run.error && <span className="ml-2 text-xs text-stop">{run.error}</span>}
                   </TD>
-                  <TD className="tabular text-xs text-muted">{new Date(run.startedAt).toLocaleString()}</TD>
+                  <TD className="tabular text-xs text-muted-foreground">{new Date(run.startedAt).toLocaleString()}</TD>
                   <TD className="text-right">
-                    <IconChevronRight className="ml-auto h-4 w-4 text-muted" />
+                    <IconChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
                   </TD>
                 </TR>
               ))}

@@ -37,7 +37,7 @@ export default async function Home() {
         title="Businesses"
         description="Pick a business to open its console."
         actions={
-          <LinkButton href="/onboarding" variant="secondary" size="sm">
+          <LinkButton href="/onboarding" variant="primary" size="sm">
             + Onboard business
           </LinkButton>
         }
@@ -62,7 +62,7 @@ export default async function Home() {
               <TD>{business.industry}</TD>
               <TD>{business.location}</TD>
               <TD className="tabular">₹{business.monthlyBudget.toLocaleString("en-IN")}</TD>
-              <TD className={liveCampaignCount > 0 ? "tabular font-semibold text-money" : "tabular text-muted"}>
+              <TD className={liveCampaignCount > 0 ? "tabular font-semibold text-money" : "tabular text-muted-foreground"}>
                 {liveCampaignCount}
               </TD>
             </TR>

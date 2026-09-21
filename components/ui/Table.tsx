@@ -1,35 +1,49 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { cn } from "./cn";
+import { cn } from "@/lib/utils";
 
 export function Table({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div
+      data-slot="table-container"
       className={cn(
-        "overflow-x-auto rounded-md border border-line bg-surface shadow-sm",
+        "overflow-x-auto rounded-md border border-border bg-card shadow-sm",
         className,
       )}
     >
-      <table className="w-full text-left text-sm">{children}</table>
+      <table data-slot="table" className="w-full text-left text-sm">
+        {children}
+      </table>
     </div>
   );
 }
 
 export function THead({ children }: { children: React.ReactNode }) {
   return (
-    <thead className="border-b border-line bg-paper/40 text-xs font-semibold uppercase tracking-wide text-muted">
+    <thead
+      data-slot="table-header"
+      className="border-b border-border bg-muted/40 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+    >
       <tr>{children}</tr>
     </thead>
   );
 }
 
 export function TH({ children, className }: { children?: React.ReactNode; className?: string }) {
-  return <th className={cn("px-4 py-3 font-semibold", className)}>{children}</th>;
+  return (
+    <th data-slot="table-head" className={cn("px-4 py-3 font-semibold", className)}>
+      {children}
+    </th>
+  );
 }
 
 export function TBody({ children }: { children: React.ReactNode }) {
-  return <tbody className="divide-y divide-line">{children}</tbody>;
+  return (
+    <tbody data-slot="table-body" className="divide-y divide-border">
+      {children}
+    </tbody>
+  );
 }
 
 /** Pass `href` only when the whole row should navigate — that's what earns the hover tint and
@@ -49,20 +63,26 @@ export function TR({
   if (href) {
     return (
       <tr
+        data-slot="table-row"
         onClick={() => router.push(href)}
-        className={cn(
-          "cursor-pointer align-top transition-colors hover:bg-paper",
-          className,
-        )}
+        className={cn("cursor-pointer align-top transition-colors hover:bg-muted", className)}
       >
         {children}
       </tr>
     );
   }
 
-  return <tr className={cn("align-top", className)}>{children}</tr>;
+  return (
+    <tr data-slot="table-row" className={cn("align-top", className)}>
+      {children}
+    </tr>
+  );
 }
 
 export function TD({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <td className={cn("px-4 py-3 text-ink", className)}>{children}</td>;
+  return (
+    <td data-slot="table-cell" className={cn("px-4 py-3 text-foreground", className)}>
+      {children}
+    </td>
+  );
 }

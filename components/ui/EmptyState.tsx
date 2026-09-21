@@ -1,4 +1,4 @@
-import { cn } from "./cn";
+import { cn } from "@/lib/utils";
 
 export function EmptyState({
   title,
@@ -17,7 +17,7 @@ export function EmptyState({
 }) {
   if (plain) {
     return (
-      <p className={cn("text-sm text-muted", className)}>
+      <p className={cn("text-sm text-muted-foreground", className)}>
         {title}
         {description && ` — ${description}`}
       </p>
@@ -32,7 +32,7 @@ export function EmptyState({
       )}
     >
       <p className="text-sm font-medium text-ink">{title}</p>
-      {description && <p className="text-sm text-muted">{description}</p>}
+      {description && <p className="text-sm text-muted-foreground">{description}</p>}
       {action}
     </div>
   );

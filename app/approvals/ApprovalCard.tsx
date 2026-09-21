@@ -41,7 +41,7 @@ export function ApprovalCard({ item }: { item: ApprovalItem }) {
   if (status !== "pending") {
     return (
       <Card>
-        <CardBody className="flex items-center justify-between text-sm text-muted">
+        <CardBody className="flex items-center justify-between text-sm text-muted-foreground">
           <span>
             {item.output.action} for {item.businessName}
           </span>
@@ -60,21 +60,21 @@ export function ApprovalCard({ item }: { item: ApprovalItem }) {
             {item.businessName}
           </Link>
         </div>
-        <p className="text-muted">
+        <p className="text-muted-foreground">
           <span className="font-medium text-ink">Expected impact:</span> {item.output.expected_impact}
         </p>
-        <p className="text-muted">
+        <p className="text-muted-foreground">
           <span className="font-medium text-ink">Confidence:</span>{" "}
           {(item.output.confidence * 100).toFixed(0)}%
         </p>
-        <p className="text-muted">
+        <p className="text-muted-foreground">
           <span className="font-medium text-ink">Rationale:</span> {item.output.rationale}
         </p>
         <p className="flex items-center gap-1.5 text-xs text-caution">
           <IconAlertTriangle className="h-3.5 w-3.5 shrink-0" />
           <span className="font-medium">Policy:</span> {item.policyReason}
         </p>
-        <pre className="overflow-x-auto rounded-md bg-paper p-2.5 text-xs text-muted">
+        <pre className="overflow-x-auto rounded-md bg-paper p-2.5 text-xs text-muted-foreground">
           {JSON.stringify(item.output.params, null, 2)}
         </pre>
 

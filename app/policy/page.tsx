@@ -43,12 +43,12 @@ export default async function PolicyPage() {
             <TBody>
               {decisions.map((decision) => (
                 <TR key={decision.id}>
-                  <TD className="text-xs text-muted">{decision.createdAt.toLocaleString()}</TD>
+                  <TD className="text-xs text-muted-foreground">{decision.createdAt.toLocaleString()}</TD>
                   <TD>{decision.action}</TD>
                   <TD>
                     <Badge tone={DECISION_TONE[decision.decision] ?? "neutral"}>{decision.decision}</Badge>
                   </TD>
-                  <TD className="text-xs text-muted">{decision.ruleId}</TD>
+                  <TD className="text-xs text-muted-foreground">{decision.ruleId}</TD>
                   <TD>{decision.reason}</TD>
                 </TR>
               ))}
@@ -72,13 +72,13 @@ export default async function PolicyPage() {
             <TBody>
               {actions.map((action) => (
                 <TR key={action.id}>
-                  <TD className="text-xs text-muted">{action.createdAt.toLocaleString()}</TD>
+                  <TD className="text-xs text-muted-foreground">{action.createdAt.toLocaleString()}</TD>
                   <TD>{action.adapter}</TD>
                   <TD>{action.method}</TD>
-                  <TD className="text-xs text-muted">
+                  <TD className="text-xs text-muted-foreground">
                     {action.before ? JSON.stringify(action.before) : "—"}
                   </TD>
-                  <TD className="text-xs text-muted">
+                  <TD className="text-xs text-muted-foreground">
                     {action.after ? JSON.stringify(action.after) : "—"}
                   </TD>
                 </TR>

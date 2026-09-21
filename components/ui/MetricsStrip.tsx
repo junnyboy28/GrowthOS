@@ -1,5 +1,5 @@
 import { AnimatedNumber, type NumberFormat } from "./AnimatedNumber";
-import { cn } from "./cn";
+import { cn } from "@/lib/utils";
 
 export interface Metric {
   label: string;
@@ -41,7 +41,7 @@ export function MetricsStrip({
     >
       {metrics.map((metric) => (
         <div key={metric.label} className="flex-1 px-5 py-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">{metric.label}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{metric.label}</p>
           <p
             className={cn(
               "tabular mt-2 text-4xl font-extrabold tracking-tight",
@@ -54,7 +54,7 @@ export function MetricsStrip({
               metric.value
             )}
           </p>
-          {metric.hint && <p className="mt-1.5 text-xs text-muted">{metric.hint}</p>}
+          {metric.hint && <p className="mt-1.5 text-xs text-muted-foreground">{metric.hint}</p>}
         </div>
       ))}
     </div>

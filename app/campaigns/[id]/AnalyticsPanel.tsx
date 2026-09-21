@@ -60,18 +60,18 @@ export function AnalyticsPanel({ campaignId, initialObservations }: AnalyticsPan
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Card>
             <CardBody className="text-sm">
-              <p className="text-xs font-medium uppercase text-muted">Interpretation</p>
+              <p className="text-xs font-medium uppercase text-muted-foreground">Interpretation</p>
               <p className="mt-1 text-ink">{observations.output.interpretation}</p>
-              <p className="mt-2 text-xs text-muted">
+              <p className="mt-2 text-xs text-muted-foreground">
                 Window {observations.output.window.start} → {observations.output.window.end}
               </p>
             </CardBody>
           </Card>
           <Card>
             <CardBody className="text-sm">
-              <p className="text-xs font-medium uppercase text-muted">Anomalies</p>
+              <p className="text-xs font-medium uppercase text-muted-foreground">Anomalies</p>
               {observations.output.anomalies.length === 0 ? (
-                <p className="mt-1 text-muted">None flagged.</p>
+                <p className="mt-1 text-muted-foreground">None flagged.</p>
               ) : (
                 <ul className="mt-1 list-inside list-disc text-ink">
                   {observations.output.anomalies.map((anomaly, index) => (

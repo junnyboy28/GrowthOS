@@ -1,40 +1,62 @@
 import Link from "next/link";
-import type { ButtonHTMLAttributes } from "react";
-import { cn } from "./cn";
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { Slot } from "radix-ui";
+import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "danger" | "success" | "ghost";
-type Size = "sm" | "md";
+/**
+ * CVA-based, built on shadcn/Radix conventions (data-slot, asChild via Slot, focus-visible ring,
+ * disabled state) — but with our own variant set and colors (ink/paper/surface/line/signal plus
+ * money/caution/stop) fed in as the theme rather than shadcn's defaults. Real hover *shades*
+ * (--color-signal-hover etc.) rather than opacity tricks, which barely read on a solid fill.
+ */
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        primary: "bg-primary text-primary-foreground shadow-sm hover:bg-signal-hover",
+        secondary:
+          "border border-border bg-secondary text-secondary-foreground shadow-sm hover:bg-muted hover:border-muted-foreground/40",
+        danger: "bg-destructive text-destructive-foreground shadow-sm hover:bg-stop-hover",
+        success: "bg-money text-white shadow-sm hover:bg-money-hover",
+        ghost: "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+      },
+      size: {
+        sm: "px-3 py-1.5 text-xs",
+        md: "px-4 py-2.5 text-sm",
+      },
+    },
+    defaultVariants: {
+      variant: "primary",
+      size: "md",
+    },
+  },
+);
 
-const VARIANT: Record<Variant, string> = {
-  primary: "bg-signal text-white shadow-sm hover:bg-signal-hover disabled:bg-signal/40",
-  secondary:
-    "bg-surface text-ink border border-line shadow-sm hover:bg-paper hover:border-muted/40 disabled:text-muted",
-  danger: "bg-stop text-white shadow-sm hover:bg-stop-hover disabled:bg-stop/40",
-  success: "bg-money text-white shadow-sm hover:bg-money-hover disabled:bg-money/40",
-  ghost: "text-muted hover:bg-ink/5 hover:text-ink disabled:text-muted/50",
-};
+export function buttonClasses(
+  variant: VariantProps<typeof buttonVariants>["variant"] = "primary",
+  size: VariantProps<typeof buttonVariants>["size"] = "md",
+  className?: string,
+) {
+  return cn(buttonVariants({ variant, size }), className);
+}
 
-const SIZE: Record<Size, string> = {
-  sm: "px-3 py-1.5 text-xs gap-1.5",
-  md: "px-4 py-2.5 text-sm gap-2",
-};
+interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
 
-export function buttonClasses(variant: Variant = "primary", size: Size = "md", className?: string) {
-  return cn(
-    "inline-flex items-center justify-center rounded-md font-semibold transition-colors disabled:cursor-not-allowed disabled:shadow-none",
-    VARIANT[variant],
-    SIZE[size],
-    className,
+export function Button({ variant, size, asChild = false, className, ...props }: ButtonProps) {
+  const Comp = asChild ? Slot.Root : "button";
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size }), className)}
+      {...props}
+    />
   );
-}
-
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant;
-  size?: Size;
-}
-
-export function Button({ variant = "primary", size = "md", className, ...props }: ButtonProps) {
-  return <button className={buttonClasses(variant, size, className)} {...props} />;
 }
 
 export function LinkButton({
@@ -45,8 +67,8 @@ export function LinkButton({
   children,
 }: {
   href: string;
-  variant?: Variant;
-  size?: Size;
+  variant?: VariantProps<typeof buttonVariants>["variant"];
+  size?: VariantProps<typeof buttonVariants>["size"];
   className?: string;
   children: React.ReactNode;
 }) {

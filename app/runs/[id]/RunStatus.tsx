@@ -45,7 +45,7 @@ const STAGE_STYLE: Record<StageState, { icon: typeof IconCheck; color: string }>
   done: { icon: IconCheck, color: "text-money" },
   running: { icon: IconRefresh, color: "text-signal" },
   failed: { icon: IconX, color: "text-stop" },
-  pending: { icon: IconClock, color: "text-muted" },
+  pending: { icon: IconClock, color: "text-muted-foreground" },
   awaiting_approval: { icon: IconPause, color: "text-caution" },
 };
 
@@ -91,7 +91,7 @@ export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: Ru
         <Card>
           <CardBody className="flex flex-col gap-4">
             {stageNames.length === 0 ? (
-              <p className="text-sm text-muted">
+              <p className="text-sm text-muted-foreground">
                 No stages registered yet — this run goes straight to done.
               </p>
             ) : (
@@ -119,7 +119,7 @@ export function RunStatus({ runId, initialRun, initialLlmCalls, stageNames }: Ru
               {run.status === "failed" && run.error && (
                 <span className="text-sm text-stop">{run.error}</span>
               )}
-              <span className="text-xs text-muted">
+              <span className="text-xs text-muted-foreground">
                 Started {new Date(run.startedAt).toLocaleString()}
                 {run.finishedAt && ` · Finished ${new Date(run.finishedAt).toLocaleString()}`}
               </span>

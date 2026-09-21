@@ -63,7 +63,7 @@ export function DemoControls({ campaignId }: { campaignId: string }) {
   return (
     <Card className="border-dashed">
       <CardBody>
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Demo controls (dev only)
         </h2>
         <div className="mt-3 flex flex-wrap gap-2">

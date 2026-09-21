@@ -1,4 +1,4 @@
-import { cn } from "./cn";
+import { cn } from "@/lib/utils";
 
 export function Card({
   className,
@@ -36,7 +36,7 @@ export function SectionHeader({
     <div className="flex items-start justify-between gap-4">
       <div>
         <h2 className="text-base font-bold tracking-tight text-ink">{title}</h2>
-        {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
+        {description && <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>}
       </div>
       {action}
     </div>

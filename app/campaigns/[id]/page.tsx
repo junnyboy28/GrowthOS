@@ -81,7 +81,7 @@ export default async function CampaignDashboardPage({
             <TBody>
               {perCreative.map((creative) => (
                 <TR key={creative.creativeId}>
-                  <TD className="tabular text-xs text-muted">{creative.creativeId.slice(0, 8)}</TD>
+                  <TD className="tabular text-xs text-muted-foreground">{creative.creativeId.slice(0, 8)}</TD>
                   <TD className="tabular">₹{creative.spend.toFixed(2)}</TD>
                   <TD className="tabular">{creative.clicks}</TD>
                   <TD className="tabular">{creative.conversions}</TD>
